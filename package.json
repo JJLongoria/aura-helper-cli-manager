@@ -1,0 +1,56 @@
+{
+  "name": "@ah/cli-manager",
+  "productName": "Aura Helper CLI Manager",
+  "version": "1.0.0",
+  "description": "Module to handle Aura Helper CLI processes used in Aura Helper VSCode Extension",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --coverage --runInBand"
+  },
+  "keywords": [
+    "aura-helper-framework",
+    "aura helper framework",
+    "Aura Helper Framework",
+    "ah-framework",
+    "AH Framework",
+    "Aura Helper",
+    "aura-helper",
+    "AuraHelper Library",
+    "AuraHelper Libraries",
+    "AH",
+    "ah",
+    "Salesforce",
+    "Salesforce Metadata",
+    "Salesforce Apps",
+    "Salesforce XML",
+    "Salesforce Tools",
+    "Apex",
+    "force.com",
+    "DevOps",
+		"devops",
+    "Aura Helper CLI Manager",
+    "CLI Manager",
+    "aura-helper-cli-manager",
+    "cli-manager",
+    "ah-cli-manager",
+    "aura-helper-cli",
+    "Aura Helper CLI"
+  ],
+  "author": "Juan José Longoria López (Kanko) <juanjoselongoria@gmail.com>",
+  "license": "GPLv3",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JJLongoria/aura-helper-cli-manager"
+  },
+  "bugs": {
+		"url": "https://github.com/JJLongoria/aura-helper-cli-manager/issues",
+		"email": "juanjoselongoria@gmail.com"
+	},
+  "dependencies": {
+    "@ah/core": "file:../ah-core"
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.20",
+    "jest": "^26.6.3"
+  }
+}
