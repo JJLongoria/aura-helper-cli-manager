@@ -27,7 +27,7 @@
     "Apex",
     "force.com",
     "DevOps",
-		"devops",
+    "devops",
     "Aura Helper CLI Manager",
     "CLI Manager",
     "aura-helper-cli-manager",
@@ -43,11 +43,12 @@
     "url": "https://github.com/JJLongoria/aura-helper-cli-manager"
   },
   "bugs": {
-		"url": "https://github.com/JJLongoria/aura-helper-cli-manager/issues",
-		"email": "juanjoselongoria@gmail.com"
-	},
+    "url": "https://github.com/JJLongoria/aura-helper-cli-manager/issues",
+    "email": "juanjoselongoria@gmail.com"
+  },
   "dependencies": {
-    "@ah/core": "file:../ah-core"
+    "@ah/core": "file:../ah-core",
+    "@ah/metadata-factory": "file:../ah-metadata-factory"
   },
   "devDependencies": {
     "@types/jest": "^26.0.20",
