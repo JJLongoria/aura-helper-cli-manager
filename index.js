@@ -19,9 +19,9 @@ class CLIManager {
 
     /**
      * Constructor to create a new CLI Manager object
-     * @param {String?} projectFolder Path to the local project root folder. './' by default
-     * @param {(String | Number)?} apiVersion API Version number to run processes and connect to salesforce
-     * @param {String?} namespacePrefix Namespace prefix from the Org 
+     * @param {String} [projectFolder] Path to the local project root folder. './' by default
+     * @param {(String | Number)} [apiVersion] API Version number to run processes and connect to salesforce
+     * @param {String} [namespacePrefix] Namespace prefix from the Org 
      */
     constructor(projectFolder, apiVersion, namespacePrefix) {
         this.projectFolder = (projectFolder !== undefined) ? projectFolder : './';
@@ -152,8 +152,8 @@ class CLIManager {
     /**
      * Method to compress a single file or folder or array with files to compress (compress more than one folder is not allowed but you can compress an entire folder an subfolders)
      * @param {String | Array<String>} filesOrFolders file path or paths to compress or folder path to compress
-     * @param {String?} sortOrder Sort order value to sort XML Elements
-     * @param {Function?} callback Optional callback function parameter to handle Aura Helper CLI Processes progress
+     * @param {String} [sortOrder] Sort order value to sort XML Elements
+     * @param {Function} [callback] Optional callback function parameter to handle Aura Helper CLI Processes progress
      *  
      * @returns {Promise<Any>} Return an empty promise when compress files finish succesfully
      * 
@@ -220,7 +220,7 @@ class CLIManager {
 
     /**
      * Method to compare the local project with the project auth org. Return the Metadata Types that exists on Org and not exists on local project
-     * @param {Function?} callback Optional callback function parameter to handle Aura Helper CLI Processes progress
+     * @param {Function} [callback] Optional callback function parameter to handle Aura Helper CLI Processes progress
      * 
      * @returns {Promise<Object>} Return a promise with a JSON Metadata Object with the data respose. Contains the Metadata Types that exists on the project org and not in the local project.
      * 
@@ -258,9 +258,9 @@ class CLIManager {
 
     /**
      * Method to compare between two orgs. Return the Metadata Types that exists on target and not exists on source. Source and Target must be authorized in the system.
-     * @param {String?} source Source org Username or Alias to compare. If undefined, use the local project auth org as source 
+     * @param {String} [source] Source org Username or Alias to compare. If undefined, use the local project auth org as source 
      * @param {String} target Target org Username or Alias to compare. (Require)
-     * @param {Function?} callback Optional callback function parameter to handle Aura Helper CLI Processes progress
+     * @param {Function} [callback] Optional callback function parameter to handle Aura Helper CLI Processes progress
      * 
      * @returns {Promise<Object>} Return a promise with a JSON Metadata Object with the data respose. Contains the Metadata Types that exists on target and not on source.
      * 
@@ -302,8 +302,8 @@ class CLIManager {
 
     /**
      * Method to describe the all or selected Metadata Types from your local project
-     * @param {Array<String>?} types List of Metadata Type API Names to describe. Undefined to describe all metadata types
-     * @param {Function?} callback Optional callback function parameter to handle Aura Helper CLI Processes progress
+     * @param {Array<String>} [types] List of Metadata Type API Names to describe. Undefined to describe all metadata types
+     * @param {Function} [callback] Optional callback function parameter to handle Aura Helper CLI Processes progress
      * 
      * @returns {Promise<Object>} Return a promise with a Metadata JSON Object with the selected Metadata Types data
      * 
@@ -342,9 +342,9 @@ class CLIManager {
 
     /**
      * Method to describe the all or selected Metadata Types from your project org
-     * @param {Boolean?} downloadAll True to download all Metadata types from all namespaces, false to download only data from org namespace
-     * @param {Array<String>?} types List of Metadata Type API Names to describe. Undefined to describe all metadata types
-     * @param {Function?} callback Optional callback function parameter to handle Aura Helper CLI Processes progress
+     * @param {Boolean} [downloadAll] True to download all Metadata types from all namespaces, false to download only data from org namespace
+     * @param {Array<String>} [types] List of Metadata Type API Names to describe. Undefined to describe all metadata types
+     * @param {Function} [callback] Optional callback function parameter to handle Aura Helper CLI Processes progress
      * 
      * @returns {Promise<Object>} Return a promise with a Metadata JSON Object with the selected Metadata Types data
      * 
@@ -388,8 +388,8 @@ class CLIManager {
 
     /**
      * Method to retrieve all or selected local special types
-     * @param {(String | Object)?} types Metadata JSON Object or Metadata JSON file with the selected types to retrieve
-     * @param {Function?} callback Optional callback function parameter to handle Aura Helper CLI Processes progress
+     * @param {(String | Object)} [types] Metadata JSON Object or Metadata JSON file with the selected types to retrieve
+     * @param {Function} [callback] Optional callback function parameter to handle Aura Helper CLI Processes progress
      * 
      * @returns {Promise<RetrieveResult>} Return a promise with a RetrieveResult object
      * 
@@ -438,9 +438,9 @@ class CLIManager {
 
     /**
      * Method to retrieve all or selected special types from org
-     * @param {Boolean?} downloadAll True to download all Metadata types from all namespaces, false to download only data from org namespace
-     * @param {(String | Object)?} types Metadata JSON Object or Metadata JSON file with the selected types to retrieve
-     * @param {Function?} callback Optional callback function parameter to handle Aura Helper CLI Processes progress
+     * @param {Boolean} [downloadAll] True to download all Metadata types from all namespaces, false to download only data from org namespace
+     * @param {(String | Object)} [types] Metadata JSON Object or Metadata JSON file with the selected types to retrieve
+     * @param {Function} [callback] Optional callback function parameter to handle Aura Helper CLI Processes progress
      * 
      * @returns {Promise<RetrieveResult>} Return a promise with a RetrieveResult object
      * 
@@ -490,9 +490,9 @@ class CLIManager {
 
     /**
      * Method to retrieve all or selected special types on mixed mode
-     * @param {Array<String>?} downloadAll True to download all Metadata types from all namespaces, false to download only data from org namespace
-     * @param {(String | Object)?} types Metadata JSON Object or Metadata JSON file with the selected types to retrieve
-     * @param {Function?} callback Optional callback function parameter to handle Aura Helper CLI Processes progress
+     * @param {Array<String>} [downloadAll] True to download all Metadata types from all namespaces, false to download only data from org namespace
+     * @param {(String | Object)} [types] Metadata JSON Object or Metadata JSON file with the selected types to retrieve
+     * @param {Function} [callback] Optional callback function parameter to handle Aura Helper CLI Processes progress
      * 
      * @returns {Promise<RetrieveResult>} Return a promise with a RetrieveResult object
      * 
@@ -543,7 +543,7 @@ class CLIManager {
 
     /**
      * Method to load all available user permissions on the project org
-     * @param {Function?} callback Optional callback function parameter to handle Aura Helper CLI Processes progress
+     * @param {Function} [callback] Optional callback function parameter to handle Aura Helper CLI Processes progress
      * 
      * @returns {Promise<Array<String>>} Return a promise with the list of available user permission API Names
      * 
@@ -584,11 +584,11 @@ class CLIManager {
     /**
      * Method to create the package XML and destructive XML files from git diffs and changes between two commits, tags, branches
      * @param {String} source Source tag, branch or commit to compare to create the package and destructive files
-     * @param {String?} target Target tag, branch or commit to compare to create the package and destructive files
-     * @param {String?} createType Create type option (package, destructive, both)
-     * @param {String?} deleteOrder Delete order to create the destructive file (before or after)
-     * @param {Boolean?} useIgnore true to use the ignore file when create the package, false in otherwise
-     * @param {Function?} callback Optional callback function parameter to handle Aura Helper CLI Processes progress
+     * @param {String} [target] Target tag, branch or commit to compare to create the package and destructive files
+     * @param {String} [createType] Create type option (package, destructive, both)
+     * @param {String} [deleteOrder] Delete order to create the destructive file (before or after)
+     * @param {Boolean} [useIgnore] true to use the ignore file when create the package, false in otherwise
+     * @param {Function} [callback] Optional callback function parameter to handle Aura Helper CLI Processes progress
      * 
      * @returns {Promise<PackageGeneratorResult>} Return a promise with the PackageGeneratorResult object with the generated file paths
      * 
@@ -638,11 +638,11 @@ class CLIManager {
     /**
      * Method to create the package XML or destructive XML file from a Metadata JSON file
      * @param {String} source Metadata JSON file with the selected types to add to the package or destructive file
-     * @param {String?} createType Create type value to create Package XML or Destructive XML with the JSON data (package or destructive) 
-     * @param {String?} deleteOrder Delete order for the destructive XML file (before or after)
-     * @param {Boolean?} useIgnore true to use the ignore file when create the package, false in otherwise
-     * @param {Boolean?} explicit True to put all metadata type and object names explicit into the package, false to use wildcards if apply (true recommended)
-     * @param {Function?} callback Optional callback function parameter to handle Aura Helper CLI Processes progress
+     * @param {String} [createType] Create type value to create Package XML or Destructive XML with the JSON data (package or destructive) 
+     * @param {String} [deleteOrder] Delete order for the destructive XML file (before or after)
+     * @param {Boolean} [useIgnore] true to use the ignore file when create the package, false in otherwise
+     * @param {Boolean} [explicit] True to put all metadata type and object names explicit into the package, false to use wildcards if apply (true recommended)
+     * @param {Function} [callback] Optional callback function parameter to handle Aura Helper CLI Processes progress
      * 
      * @returns {Promise<PackageGeneratorResult>} Return a promise with the PackageGeneratorResult object with the generated file paths
      * 
@@ -691,10 +691,10 @@ class CLIManager {
     /**
      * Method to create the package XML or destructive XML from other Package XML Files
      * @param {String | Array<String>} source Path or Paths to the Package XML or Destructive XML files
-     * @param {String?} createType Create type value to create Package XML or Destructive XML with the package data (package or destructive) 
-     * @param {String?} deleteOrder Delete order for the destructive XML file (before or after)
-     * @param {Boolean?} useIgnore true to use the ignore file when create the package, false in otherwise
-     * @param {Function?} callback Optional callback function parameter to handle Aura Helper CLI Processes progress
+     * @param {String} [createType] Create type value to create Package XML or Destructive XML with the package data (package or destructive) 
+     * @param {String} [deleteOrder] Delete order for the destructive XML file (before or after)
+     * @param {Boolean} [useIgnore] true to use the ignore file when create the package, false in otherwise
+     * @param {Function} [callback] Optional callback function parameter to handle Aura Helper CLI Processes progress
      * 
      * @returns {Promise<PackageGeneratorResult>} Return a promise with the PackageGeneratorResult object with the generated file paths
      * 
@@ -744,8 +744,8 @@ class CLIManager {
 
     /**
      * Method to ignore Metadata Types from the local project
-     * @param {Array<String>?} types List of Metadata Type API Names to ignore. Undefined to ignore all metadata types
-     * @param {Function?} callback Optional callback function parameter to handle Aura Helper CLI Processes progress
+     * @param {Array<String>} [types] List of Metadata Type API Names to ignore. Undefined to ignore all metadata types
+     * @param {Function} [callback] Optional callback function parameter to handle Aura Helper CLI Processes progress
      * 
      * @returns {Promise<Any>} Return an empty promise when the ignore operation finish succesfully
      * 
@@ -788,10 +788,10 @@ class CLIManager {
 
     /**
      * Method to repair all error dependencies from your local project. Also you can check only to check if has errors.
-     * @param {(String | Object)?} types Metadata JSON Object or Metadata JSON file with the selected types to repair or check error dependencies. Undefined to repair or check error all metadata types
-     * @param {Boolean?} onlyCheck True to not repair and only check the errors, false to repair errors automatically
-     * @param {Boolean?} useIgnore true to use the ignore file when repair dependencies, false in otherwise
-     * @param {Function?} callback Optional callback function parameter to handle Aura Helper CLI Processes progress
+     * @param {(String | Object)} [types] Metadata JSON Object or Metadata JSON file with the selected types to repair or check error dependencies. Undefined to repair or check error all metadata types
+     * @param {Boolean} [onlyCheck] True to not repair and only check the errors, false to repair errors automatically
+     * @param {Boolean} [useIgnore] true to use the ignore file when repair dependencies, false in otherwise
+     * @param {Function} [callback] Optional callback function parameter to handle Aura Helper CLI Processes progress
      * 
      * @returns {Promise<Object>} Return a promise with the Repair response if you check repair, or the Only Check Response when select check only option
      * 
