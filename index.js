@@ -808,7 +808,6 @@ class CLIManager {
                 const process = ProcessFactory.auraHelperRepairDependencies(projectFolder, {
                     types: types,
                     useIgnore: useIgnore,
-                    outputFile: this.outputPath,
                     onlyCheck: onlyCheck,
                     ignoreFile: this.ignoreFile,
                     compress: this.compressFiles,
