@@ -114,11 +114,11 @@ Constructor to create a new CLI Manager object. All parameters are optional and 
     
     Method to set the output folder path to redirect the response to files
 
-  - [**onProgress(progressCallback)**](#onprogressprogresscallback)
+  - [**onProgress(callback)**](#onprogresscallback)
     
-    Method to handle the general CLI Manager progress (is called from all methods to handle the progress)
+    Method to handle the progress event to handle AHCLI Progression
 
-  - [**onAbort(abortCallback)**](#onabortabortcallback)
+  - [**onAbort(callback)**](#onabortcallback)
     
     Method to handle when CLI Manager is aborted
 
@@ -364,11 +364,11 @@ Returns the cli manager object
     cliManager.setApiVersion(50).setOutputPath('path/to/ignore/output/path'); 
 ---
 
-## [**onProgress(progressCallback)**](#onprogressprogresscallback)
-Method to handle the general CLI Manager progress (is called from all methods to handle the progress)
+## [**onProgress(callback)**](#onprogresscallback)
+Method to handle the progress event to handle AHCLI Progression
 
 ### **Parameters:**
-  - **progressCallback**: Callback function to handle the progress
+  - **callback**: Callback function to handle the progress
     - Function
 
 ### **Return:**
@@ -392,11 +392,11 @@ Returns the cli manager object
     }); 
 ---
 
-## [**onAbort(abortCallback)**](#onabortabortcallback)
-Method to handle when CLI Manager is aborted
+## [**onAbort(callback)**](#onabortcallback)
+Method to handle the event when CLIManager processes are aborted
 
 ### **Parameters:**
-  - **abortCallback**: Callback function to call when CLI Manager is aborted
+  - **callback**: Callback function to call when CLI Manager is aborted
     - Function
 
 ### **Return:**
@@ -445,8 +445,6 @@ Method to compress a single file or folder or array with files to compress (comp
     - String | Array\<String\>
   - **sortOrder**: Sort order value to sort XML Elements compress
     - String
-  - **callback**: Optional callback function parameter to handle Aura Helper CLI Processes progress
-    - Function
 
 ### **Return:**
 Return an empty promise when compress files finish succesfully
@@ -523,8 +521,6 @@ This method can throw the next exceptions:
 Method to compare the local project with the project auth org. Return the Metadata Types that exists on Org and not exists on local project. See [Metadata JSON Format](#metadata-file) section to understand the JSON Metadata Format
 
 ### **Parameters:**
-  - **callback**: Optional callback function parameter to handle Aura Helper CLI Processes progress
-    - Function
 
 ### **Return:**
 Return a promise with a JSON Metadata Object with the data respose. Contains the Metadata Types that exists on the project org and not in the local project.
@@ -564,8 +560,6 @@ Method to compare between two orgs. Return the Metadata Types that exists on tar
     - String
   - **target**: Target org Username or Alias to compare. (Require)
     - String
-  - **callback**: Optional callback function parameter to handle Aura Helper CLI Processes progress
-    - Function
 
 ### **Return:**
 Return a promise with a JSON Metadata Object with the data respose. Contains the Metadata Types that exists on target and not on source.
@@ -615,8 +609,6 @@ Method to describe the all or selected Metadata Types from your local project. S
 ### **Parameters:**
   - **types**: List of Metadata Type API Names to describe. Undefined to describe all local metadata types 
     - Array\<String\>
-  - **callback**: Optional callback function parameter to handle Aura Helper CLI Processes progress
-    - Function
 
 ### **Return:**
 Return a promise with a Metadata JSON Object with the selected Metadata Types data
@@ -675,8 +667,6 @@ Method to describe the all or selected Metadata Types from your project org. See
     - Boolean
   - **types**: List of Metadata Type API Names to describe. Undefined to describe all local metadata types
     - Array\<String\>
-  - **callback**: Optional callback function parameter to handle Aura Helper CLI Processes progress
-    - Function
 
 ### **Return:**
 Return a promise with a Metadata JSON Object with the selected Metadata Types data
@@ -733,8 +723,6 @@ Method to retrieve all or selected local special types. See [Metadata JSON Forma
 ### **Parameters:**
   - **types**: Metadata JSON Object or Metadata JSON file with the selected types to retrieve
     - String | Object
-  - **callback**: Optional callback function parameter to handle Aura Helper CLI Processes progress
-    - Function
 
 ### **Return:**
 Return a promise with a RetrieveResult object
@@ -792,8 +780,6 @@ Method to retrieve all or selected special types from org. See [Metadata JSON Fo
     - Boolean
   - **types**: Metadata JSON Object or Metadata JSON file with the selected types to retrieve
     - String | Object
-  - **callback**: Optional callback function parameter to handle Aura Helper CLI Processes progress
-    - Function
 
 ### **Return:**
 Return a promise with a RetrieveResult object
@@ -851,8 +837,6 @@ Method to retrieve all or selected special types on mixed mode. See [Metadata JS
     - Boolean
   - **types**: Metadata JSON Object or Metadata JSON file with the selected types to retrieve
     - String | Object
-  - **callback**: Optional callback function parameter to handle Aura Helper CLI Processes progress
-    - Function
 
 ### **Return:**
 Return a promise with a RetrieveResult object
@@ -951,8 +935,6 @@ Method to create the package XML and destructive XML files from git diffs and ch
     - String
   - **useIgnore**: true to use the ignore file when create the package, false in otherwise
     - Boolean
-  - **callback**: Optional callback function parameter to handle Aura Helper CLI Processes progress
-    - Function
 
 ### **Return:**
 Return a promise with the PackageGeneratorResult object with the generated file paths
@@ -1019,8 +1001,6 @@ Method to create the package XML or destructive XML file from a Metadata JSON fi
     - Boolean
   - **explicit**: True to put all metadata type and object names explicit into the package, false to use wildcards if apply (true recommended)
     - Boolean
-  - **callback**: Optional callback function parameter to handle Aura Helper CLI Processes progress
-    - Function
 
 ### **Return:**
 Return a promise with the PackageGeneratorResult object with the generated file paths
@@ -1084,8 +1064,6 @@ Method to create the package XML or destructive XML from other Package XML Files
     - String
   - **useIgnore**: true to use the ignore file when create the package, false in otherwise
     - Boolean
-  - **callback**: Optional callback function parameter to handle Aura Helper CLI Processes progress
-    - Function
 
 ### **Return:**
 Return a promise with the PackageGeneratorResult object with the generated file paths
@@ -1155,8 +1133,6 @@ Method to ignore Metadata Types from the local project
 ### **Parameters:**
   - **types**: List of Metadata Type API Names to ignore. Undefined to ignore all metadata types
     - Array\<String\>
-  - **callback**: Optional callback function parameter to handle Aura Helper CLI Processes progress
-    - Function
 
 ### **Return:**
 Return an empty promise when the ignore operation finish succesfully
@@ -1218,8 +1194,6 @@ Method to repair all error dependencies from your local project. Also you can ch
     - Boolean
    - **useIgnore**: true to use the ignore file when repair dependencies, false in otherwise
     - Boolean
-  - **callback**: Optional callback function parameter to handle Aura Helper CLI Processes progress
-    - Function
 
 ### **Return:**
 Return a promise with the Repair response if you check repair, or the Only Check Response when select check only option
