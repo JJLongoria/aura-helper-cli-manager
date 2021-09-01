@@ -1,9 +1,15 @@
+const EventEmitter = require('events').EventEmitter;
 const { ProcessHandler, ProcessFactory } = require('@ah/core').ProcessManager;
 const { Validator, Utils, MetadataUtils, StrUtils } = require('@ah/core').CoreUtils;
 const { AuraHelperCLIResponse, RetrieveResult, PackageGeneratorResult } = require('@ah/core').Types;
 const { FileChecker } = require('@ah/core').FileSystem;
 const MetadataFactory = require('@ah/metadata-factory');
 const { CLIManagerException, OperationNotSupportedException, DataNotFoundException, WrongDatatypeException } = require('@ah/core').Exceptions;
+
+const EVENT = {
+    ABORT: 'abort',
+    PROGRESS: 'progress'
+}
 
 /**
  * Class to create and handle Aura Helper CLI processes. 
@@ -33,8 +39,7 @@ class CLIManager {
         this.outputPath;
 
         this._inProgress = false;
-        this._progressCallback;
-        this._abortCallback;
+        this._event = new EventEmitter();
         this._processes = {};
         this._abort = false;
     }
@@ -117,24 +122,24 @@ class CLIManager {
     }
 
     /**
-     * Method to handle the general CLI Manager progress (is called from all methods to handle the progress)
-     * @param {Function} progressCallback Callback function to handle the progress
+     * Method to handle the progress event to handle AHCLI Progression
+     * @param {Function} callback Callback function to handle the progress
      * 
      * @returns {CLIManager} Returns the cli manager object
      */
-    onProgress(progressCallback) {
-        this._progressCallback = progressCallback;
+    onProgress(callback) {
+        this._event.on(EVENT.PROGRESS, callback);
         return this;
     }
 
     /**
-     * Method to handle when CLI Manager is aborted
-     * @param {Function} abortCallback Callback function to call when CLI Manager is aborted
+     * Method to handle the event when CLIManager processes are aborted
+     * @param {Function} callback Callback function to call when CLI Manager is aborted
      * 
      * @returns {CLIManager} Returns the cli manager object
      */
-    onAbort(abortCallback) {
-        this._abortCallback = abortCallback;
+    onAbort(callback) {
+        this._event.on(EVENT.ABORT, callback);
         return this;
     }
 
@@ -144,16 +149,13 @@ class CLIManager {
     abortProcess() {
         this._abort = true;
         killProcesses(this);
-        if (this._abortCallback) {
-            this._abortCallback.call(this);
-        }
+        this._event.emit(EVENT.ABORT);
     }
 
     /**
      * Method to compress a single file or folder or array with files to compress (compress more than one folder is not allowed but you can compress an entire folder an subfolders)
      * @param {String | Array<String>} filesOrFolders file path or paths to compress or folder path to compress
      * @param {String} [sortOrder] Sort order value to sort XML Elements
-     * @param {Function} [callback] Optional callback function parameter to handle Aura Helper CLI Processes progress
      *  
      * @returns {Promise<Any>} Return an empty promise when compress files finish succesfully
      * 
@@ -170,7 +172,6 @@ class CLIManager {
      * @throws {InvalidFilePathException} If the file path is not a file
      */
     compress(filesOrFolders, sortOrder) {
-        const progressCallback = getCallback(arguments, this);
         startOperation(this);
         return new Promise((resolve, reject) => {
             try {
@@ -196,10 +197,14 @@ class CLIManager {
                 let process;
                 const projectFolder = Validator.validateFolderPath(this.projectFolder);
                 if (nFiles > 0) {
-                    process = ProcessFactory.auraHelperCompressFile(projectFolder, { file: resultPaths, sortOrder: sortOrder }, progressCallback);
+                    process = ProcessFactory.auraHelperCompressFile(projectFolder, { file: resultPaths, sortOrder: sortOrder }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                    });
                 }
                 else {
-                    process = ProcessFactory.auraHelperCompressFolder(projectFolder, { folder: resultPaths, sortOrder: sortOrder }, progressCallback);
+                    process = ProcessFactory.auraHelperCompressFolder(projectFolder, { folder: resultPaths, sortOrder: sortOrder }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                    });
                 }
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
@@ -220,7 +225,6 @@ class CLIManager {
 
     /**
      * Method to compare the local project with the project auth org. Return the Metadata Types that exists on Org and not exists on local project
-     * @param {Function} [callback] Optional callback function parameter to handle Aura Helper CLI Processes progress
      * 
      * @returns {Promise<Object>} Return a promise with a JSON Metadata Object with the data respose. Contains the Metadata Types that exists on the project org and not in the local project.
      * 
@@ -233,12 +237,13 @@ class CLIManager {
      * @throws {WrongDatatypeException} If the api version is not a Number or String. Can be undefined
      */
     compareWithOrg() {
-        const progressCallback = getCallback(arguments, this);
         startOperation(this);
         return new Promise((resolve, reject) => {
             try {
                 const projectFolder = Validator.validateFolderPath(this.projectFolder);
-                const process = ProcessFactory.auraHelperOrgCompare(projectFolder, { apiVersion: this.apiVersion }, progressCallback)
+                const process = ProcessFactory.auraHelperOrgCompare(projectFolder, { apiVersion: this.apiVersion }, (ahCliProgress) => {
+                    this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                })
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
                     handleResponse(response, () => {
@@ -258,9 +263,8 @@ class CLIManager {
 
     /**
      * Method to compare between two orgs. Return the Metadata Types that exists on target and not exists on source. Source and Target must be authorized in the system.
-     * @param {String} [source] Source org Username or Alias to compare. If undefined, use the local project auth org as source 
-     * @param {String} target Target org Username or Alias to compare. (Require)
-     * @param {Function} [callback] Optional callback function parameter to handle Aura Helper CLI Processes progress
+     * @param {String} sourceOrTarget Source org Username or Alias to compare. If does not pass target, the source will be the local project auth org and the target the parameter passed as sourceOrTarget 
+     * @param {String} [target] Target org Username or Alias to compare. (Require)
      * 
      * @returns {Promise<Object>} Return a promise with a JSON Metadata Object with the data respose. Contains the Metadata Types that exists on target and not on source.
      * 
@@ -272,17 +276,18 @@ class CLIManager {
      * @throws {InvalidDirectoryPathException} If the project folder path is not a directory
      * @throws {WrongDatatypeException} If the api version is not a Number or String. Can be undefined
      */
-    compareOrgBetween(source, target) {
-        if(source && !target){
-            target = source;
-            source = undefined;
+    compareOrgBetween(sourceOrTarget, target) {
+        if (sourceOrTarget && !target) {
+            target = sourceOrTarget;
+            sourceOrTarget = undefined;
         }
-        const progressCallback = getCallback(arguments, this);
         startOperation(this);
         return new Promise((resolve, reject) => {
             try {
                 const projectFolder = Validator.validateFolderPath(this.projectFolder);
-                const process = ProcessFactory.auraHelperOrgCompareBetween(projectFolder, { source: source, target: target, apiVersion: this.apiVersion }, progressCallback)
+                const process = ProcessFactory.auraHelperOrgCompareBetween(projectFolder, { source: sourceOrTarget, target: target, apiVersion: this.apiVersion }, (ahCliProgress) => {
+                    this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                })
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
                     handleResponse(response, () => {
@@ -303,7 +308,6 @@ class CLIManager {
     /**
      * Method to describe the all or selected Metadata Types from your local project
      * @param {Array<String>} [types] List of Metadata Type API Names to describe. Undefined to describe all metadata types
-     * @param {Function} [callback] Optional callback function parameter to handle Aura Helper CLI Processes progress
      * 
      * @returns {Promise<Object>} Return a promise with a Metadata JSON Object with the selected Metadata Types data
      * 
@@ -316,13 +320,14 @@ class CLIManager {
      * @throws {WrongDatatypeException} If the api version is not a Number or String. Can be undefined
      */
     describeLocalMetadata(types) {
-        const progressCallback = getCallback(arguments, this);
         startOperation(this);
         return new Promise((resolve, reject) => {
             try {
                 types = transformTypesToAHCLIInput(types, true);
                 const projectFolder = Validator.validateFolderPath(this.projectFolder);
-                const process = ProcessFactory.auraHelperDescribeMetadata(projectFolder, { fromOrg: false, types: types, apiVersion: this.apiVersion }, progressCallback)
+                const process = ProcessFactory.auraHelperDescribeMetadata(projectFolder, { fromOrg: false, types: types, apiVersion: this.apiVersion }, (ahCliProgress) => {
+                    this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                })
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
                     handleResponse(response, () => {
@@ -344,7 +349,6 @@ class CLIManager {
      * Method to describe the all or selected Metadata Types from your project org
      * @param {Boolean} [downloadAll] True to download all Metadata types from all namespaces, false to download only data from org namespace
      * @param {Array<String>} [types] List of Metadata Type API Names to describe. Undefined to describe all metadata types
-     * @param {Function} [callback] Optional callback function parameter to handle Aura Helper CLI Processes progress
      * 
      * @returns {Promise<Object>} Return a promise with a Metadata JSON Object with the selected Metadata Types data
      * 
@@ -357,7 +361,6 @@ class CLIManager {
      * @throws {WrongDatatypeException} If the api version is not a Number or String. Can be undefined
      */
     describeOrgMetadata(downloadAll, types) {
-        const progressCallback = getCallback(arguments, this);
         startOperation(this);
         return new Promise((resolve, reject) => {
             try {
@@ -368,7 +371,9 @@ class CLIManager {
                     downloadAll: downloadAll,
                     types: types,
                     apiVersion: this.apiVersion
-                }, progressCallback);
+                }, (ahCliProgress) => {
+                    this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                });
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
                     handleResponse(response, () => {
@@ -389,7 +394,6 @@ class CLIManager {
     /**
      * Method to retrieve all or selected local special types
      * @param {(String | Object)} [types] Metadata JSON Object or Metadata JSON file with the selected types to retrieve
-     * @param {Function} [callback] Optional callback function parameter to handle Aura Helper CLI Processes progress
      * 
      * @returns {Promise<RetrieveResult>} Return a promise with a RetrieveResult object
      * 
@@ -406,7 +410,6 @@ class CLIManager {
      * @throws {WrongDatatypeException} If the api version is not a Number or String. Can be undefined
      */
     retrieveLocalSpecialMetadata(types) {
-        const progressCallback = getCallback(arguments, this);
         startOperation(this);
         return new Promise((resolve, reject) => {
             try {
@@ -418,7 +421,9 @@ class CLIManager {
                     apiVersion: this.apiVersion,
                     compress: this.compressFiles,
                     sortOrder: this.sortOrder
-                }, progressCallback);
+                }, (ahCliProgress) => {
+                    this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                });
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
                     handleResponse(response, () => {
@@ -440,7 +445,6 @@ class CLIManager {
      * Method to retrieve all or selected special types from org
      * @param {Boolean} [downloadAll] True to download all Metadata types from all namespaces, false to download only data from org namespace
      * @param {(String | Object)} [types] Metadata JSON Object or Metadata JSON file with the selected types to retrieve
-     * @param {Function} [callback] Optional callback function parameter to handle Aura Helper CLI Processes progress
      * 
      * @returns {Promise<RetrieveResult>} Return a promise with a RetrieveResult object
      * 
@@ -457,7 +461,6 @@ class CLIManager {
      * @throws {WrongDatatypeException} If the api version is not a Number or String. Can be undefined
      */
     retrieveOrgSpecialMetadata(downloadAll, types) {
-        const progressCallback = getCallback(arguments, this);
         startOperation(this);
         return new Promise((resolve, reject) => {
             try {
@@ -470,7 +473,9 @@ class CLIManager {
                     apiVersion: this.apiVersion,
                     compress: this.compressFiles,
                     sortOrder: this.sortOrder
-                }, progressCallback);
+                }, (ahCliProgress) => {
+                    this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                });
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
                     handleResponse(response, () => {
@@ -490,9 +495,8 @@ class CLIManager {
 
     /**
      * Method to retrieve all or selected special types on mixed mode
-     * @param {Array<String>} [downloadAll] True to download all Metadata types from all namespaces, false to download only data from org namespace
+     * @param {Boolean} [downloadAll] True to download all Metadata types from all namespaces, false to download only data from org namespace
      * @param {(String | Object)} [types] Metadata JSON Object or Metadata JSON file with the selected types to retrieve
-     * @param {Function} [callback] Optional callback function parameter to handle Aura Helper CLI Processes progress
      * 
      * @returns {Promise<RetrieveResult>} Return a promise with a RetrieveResult object
      * 
@@ -509,7 +513,6 @@ class CLIManager {
      * @throws {WrongDatatypeException} If the api version is not a Number or String. Can be undefined
      */
     retrieveMixedSpecialMetadata(downloadAll, types) {
-        const progressCallback = getCallback(arguments, this);
         startOperation(this);
         return new Promise((resolve, reject) => {
             try {
@@ -523,7 +526,9 @@ class CLIManager {
                     apiVersion: this.apiVersion,
                     compress: this.compressFiles,
                     sortOrder: this.sortOrder
-                }, progressCallback);
+                }, (ahCliProgress) => {
+                    this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                });
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
                     handleResponse(response, () => {
@@ -543,7 +548,6 @@ class CLIManager {
 
     /**
      * Method to load all available user permissions on the project org
-     * @param {Function} [callback] Optional callback function parameter to handle Aura Helper CLI Processes progress
      * 
      * @returns {Promise<Array<String>>} Return a promise with the list of available user permission API Names
      * 
@@ -556,14 +560,15 @@ class CLIManager {
      * @throws {WrongDatatypeException} If the api version is not a Number or String. Can be undefined
      */
     loadUserPermissions() {
-        const progressCallback = getCallback(arguments, this);
         startOperation(this);
         return new Promise((resolve, reject) => {
             try {
                 const projectFolder = Validator.validateFolderPath(this.projectFolder);
                 const process = ProcessFactory.auraHelperLoadPermissions(projectFolder, {
                     apiVersion: this.apiVersion,
-                }, progressCallback);
+                }, (ahCliProgress) => {
+                    this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                });
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
                     handleResponse(response, () => {
@@ -588,7 +593,6 @@ class CLIManager {
      * @param {String} [createType] Create type option (package, destructive, both)
      * @param {String} [deleteOrder] Delete order to create the destructive file (before or after)
      * @param {Boolean} [useIgnore] true to use the ignore file when create the package, false in otherwise
-     * @param {Function} [callback] Optional callback function parameter to handle Aura Helper CLI Processes progress
      * 
      * @returns {Promise<PackageGeneratorResult>} Return a promise with the PackageGeneratorResult object with the generated file paths
      * 
@@ -601,7 +605,6 @@ class CLIManager {
      * @throws {WrongDatatypeException} If the api version is not a Number or String. Can be undefined
      */
     createPackageFromGit(source, target, createType, deleteOrder, useIgnore) {
-        const progressCallback = getCallback(arguments, this);
         startOperation(this);
         return new Promise((resolve, reject) => {
             try {
@@ -617,7 +620,9 @@ class CLIManager {
                     ignoreFile: this.ignoreFile,
                     apiVersion: this.apiVersion,
                     explicit: true,
-                }, progressCallback);
+                }, (ahCliProgress) => {
+                    this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                });
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
                     handleResponse(response, () => {
@@ -642,7 +647,6 @@ class CLIManager {
      * @param {String} [deleteOrder] Delete order for the destructive XML file (before or after)
      * @param {Boolean} [useIgnore] true to use the ignore file when create the package, false in otherwise
      * @param {Boolean} [explicit] True to put all metadata type and object names explicit into the package, false to use wildcards if apply (true recommended)
-     * @param {Function} [callback] Optional callback function parameter to handle Aura Helper CLI Processes progress
      * 
      * @returns {Promise<PackageGeneratorResult>} Return a promise with the PackageGeneratorResult object with the generated file paths
      * 
@@ -655,7 +659,6 @@ class CLIManager {
      * @throws {WrongDatatypeException} If the api version is not a Number or String. Can be undefined
      */
     createPackageFromJSON(source, createType, deleteOrder, useIgnore, explicit) {
-        const progressCallback = getCallback(arguments, this);
         startOperation(this);
         return new Promise((resolve, reject) => {
             try {
@@ -670,7 +673,9 @@ class CLIManager {
                     ignoreFile: this.ignoreFile,
                     apiVersion: this.apiVersion,
                     explicit: explicit,
-                }, progressCallback);
+                }, (ahCliProgress) => {
+                    this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                });
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
                     handleResponse(response, () => {
@@ -694,7 +699,6 @@ class CLIManager {
      * @param {String} [createType] Create type value to create Package XML or Destructive XML with the package data (package or destructive) 
      * @param {String} [deleteOrder] Delete order for the destructive XML file (before or after)
      * @param {Boolean} [useIgnore] true to use the ignore file when create the package, false in otherwise
-     * @param {Function} [callback] Optional callback function parameter to handle Aura Helper CLI Processes progress
      * 
      * @returns {Promise<PackageGeneratorResult>} Return a promise with the PackageGeneratorResult object with the generated file paths
      * 
@@ -707,7 +711,6 @@ class CLIManager {
      * @throws {WrongDatatypeException} If the api version is not a Number or String. Can be undefined
      */
     createPackageFromOtherPackages(source, createType, deleteOrder, useIgnore) {
-        const progressCallback = getCallback(arguments, this);
         startOperation(this);
         return new Promise((resolve, reject) => {
             try {
@@ -724,7 +727,9 @@ class CLIManager {
                     ignoreFile: this.ignoreFile,
                     apiVersion: this.apiVersion,
                     explicit: true,
-                }, progressCallback);
+                }, (ahCliProgress) => {
+                    this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                });
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
                     handleResponse(response, () => {
@@ -745,7 +750,6 @@ class CLIManager {
     /**
      * Method to ignore Metadata Types from the local project
      * @param {Array<String>} [types] List of Metadata Type API Names to ignore. Undefined to ignore all metadata types
-     * @param {Function} [callback] Optional callback function parameter to handle Aura Helper CLI Processes progress
      * 
      * @returns {Promise<Any>} Return an empty promise when the ignore operation finish succesfully
      * 
@@ -757,7 +761,6 @@ class CLIManager {
      * @throws {InvalidDirectoryPathException} If the project folder path is not a directory
      */
     ignoreMetadata(types) {
-        const progressCallback = getCallback(arguments, this);
         startOperation(this);
         return new Promise((resolve, reject) => {
             try {
@@ -768,7 +771,9 @@ class CLIManager {
                     ignoreFile: this.ignoreFile,
                     compress: this.compressFiles,
                     sortOrder: this.sortOrder
-                }, progressCallback);
+                }, (ahCliProgress) => {
+                    this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                });
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
                     handleResponse(response, () => {
@@ -791,7 +796,6 @@ class CLIManager {
      * @param {(String | Object)} [types] Metadata JSON Object or Metadata JSON file with the selected types to repair or check error dependencies. Undefined to repair or check error all metadata types
      * @param {Boolean} [onlyCheck] True to not repair and only check the errors, false to repair errors automatically
      * @param {Boolean} [useIgnore] true to use the ignore file when repair dependencies, false in otherwise
-     * @param {Function} [callback] Optional callback function parameter to handle Aura Helper CLI Processes progress
      * 
      * @returns {Promise<Object>} Return a promise with the Repair response if you check repair, or the Only Check Response when select check only option
      * 
@@ -803,7 +807,6 @@ class CLIManager {
      * @throws {InvalidDirectoryPathException} If the project folder path is not a directory
      */
     repairDependencies(types, onlyCheck, useIgnore) {
-        const progressCallback = getCallback(arguments, this);
         startOperation(this);
         return new Promise((resolve, reject) => {
             try {
@@ -816,7 +819,9 @@ class CLIManager {
                     ignoreFile: this.ignoreFile,
                     compress: this.compressFiles,
                     sortOrder: this.sortOrder
-                }, progressCallback);
+                }, (ahCliProgress) => {
+                    this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                });
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
                     handleResponse(response, () => {
@@ -981,7 +986,7 @@ function transformTypesToAHCLIInput(types, onlyTypes) {
                         } else if (MetadataUtils.haveChilds(metadataObject)) {
                             for (const metadataItemtName of Object.keys(metadataObject.childs)) {
                                 const metadataItem = metadataObject.childs[metadataItemtName];
-                                if(metadataItem.checked){
+                                if (metadataItem.checked) {
                                     result.push(metadataTypeName + ':' + metadataObject + ':' + metadataItem);
                                 }
                             }

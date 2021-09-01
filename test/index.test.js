@@ -13,18 +13,18 @@ describe('Testing ./index.js', () => {
         cliManager.setSortOrder('simpleFirst');
         cliManager.setIgnoreFile('./test/assets/SFDXProject/.ahignore.json');
         cliManager.setOutputPath('./test/assets/SFDXProject/manifest');
-        let response = await cliManager.compress('./test/assets/SFDXProject/force-app/main/default/applications/app_service_console.app-meta.xml', undefined, (data) => { });
-        response = await cliManager.compress('./test/assets/SFDXProject/force-app/main/default/applications', undefined, (data) => { });
-        response = await cliManager.compress(['./test/assets/SFDXProject/force-app/main/default/applications/app_service_console.app-meta.xml', './test/assets/SFDXProject/force-app/main/default/applications/Graphics_Pack.app-meta.xml'], undefined, (data) => { });
+        let response = await cliManager.compress('./test/assets/SFDXProject/force-app/main/default/applications/app_service_console.app-meta.xml', undefined);
+        response = await cliManager.compress('./test/assets/SFDXProject/force-app/main/default/applications', undefined);
+        response = await cliManager.compress(['./test/assets/SFDXProject/force-app/main/default/applications/app_service_console.app-meta.xml', './test/assets/SFDXProject/force-app/main/default/applications/Graphics_Pack.app-meta.xml'], undefined);
         try {
-            response = await cliManager.compress({}, undefined, (data) => { });
+            response = await cliManager.compress({}, undefined);
         } catch (error) {
 
         }
         try {
             response = await cliManager.compress('./test/assets/SFDXProject/force-app/main/default/profiles', undefined, async (data) => {
                 try {
-                    await cliManager.compress('./test/assets/SFDXProject/force-app/main/default/profiles/Usuario Financiero.profile-meta.xml', undefined, (data) => { });
+                    await cliManager.compress('./test/assets/SFDXProject/force-app/main/default/profiles/Usuario Financiero.profile-meta.xml', undefined);
                 } catch (error) {
 
                 }
@@ -44,14 +44,10 @@ describe('Testing ./index.js', () => {
         cliManager.setSortOrder('simpleFirst');
         cliManager.setIgnoreFile('./test/assets/SFDXProject/.ahignore.json');
         cliManager.setOutputPath('./test/assets/SFDXProject/manifest');
-        let response = await cliManager.compareWithOrg((data) => { 
-            //console.log(data);
-        });
+        let response = await cliManager.compareWithOrg();
         try{
             cliManager.setProjectFolder('./test/assets/SFDXProjects');
-            response = await cliManager.compareWithOrg((data) => { 
-                //console.log(data);
-            });
+            response = await cliManager.compareWithOrg();
         } catch(error){
 
         }
@@ -66,14 +62,10 @@ describe('Testing ./index.js', () => {
         cliManager.setSortOrder('simpleFirst');
         cliManager.setIgnoreFile('./test/assets/SFDXProject/.ahignore.json');
         cliManager.setOutputPath('./test/assets/SFDXProject/manifest');
-        let response = await cliManager.compareOrgBetween('MyOrg', 'MyOrg', (data) => { 
-            //console.log(data);
-        });
+        let response = await cliManager.compareOrgBetween('MyOrg', 'MyOrg');
         try{
             cliManager.setProjectFolder('./test/assets/SFDXProjects');
-            response = await cliManager.compareOrgBetween('MyOrg', 'MyOrg', (data) => { 
-                //console.log(data);
-            });
+            response = await cliManager.compareOrgBetween('MyOrg', 'MyOrg');
         } catch(error){
 
         }
@@ -91,14 +83,10 @@ describe('Testing ./index.js', () => {
         cliManager.setOutputPath('./test/assets/SFDXProject/manifest');
         const types = {};
         types[MetadataTypes.PROFILE] = new MetadataType(MetadataTypes.PROFILE, true);
-        let response = await cliManager.retrieveOrgSpecialMetadata(false, types, (data) => { 
-            //console.log(data);
-        });
+        let response = await cliManager.retrieveOrgSpecialMetadata(false, types);
         try{
             cliManager.setProjectFolder('./test/assets/SFDXProjects');
-            response = await cliManager.retrieveOrgSpecialMetadata(false, types, (data) => { 
-                //console.log(data);
-            });
+            response = await cliManager.retrieveOrgSpecialMetadata(false, types);
         } catch(error){
 
         }
@@ -116,14 +104,10 @@ describe('Testing ./index.js', () => {
         cliManager.setOutputPath('./test/assets/SFDXProject/manifest');
         const types = {};
         types[MetadataTypes.PROFILE] = new MetadataType(MetadataTypes.PROFILE, true);
-        let response = await cliManager.retrieveLocalSpecialMetadata(types, (data) => { 
-            //console.log(data);
-        });
+        let response = await cliManager.retrieveLocalSpecialMetadata(types);
         try{
             cliManager.setProjectFolder('./test/assets/SFDXProjects');
-            response = await cliManager.retrieveLocalSpecialMetadata(types, (data) => { 
-                //console.log(data);
-            });
+            response = await cliManager.retrieveLocalSpecialMetadata(types);
         } catch(error){
 
         }
@@ -141,14 +125,10 @@ describe('Testing ./index.js', () => {
         cliManager.setOutputPath('./test/assets/SFDXProject/manifest');
         const types = {};
         types[MetadataTypes.PROFILE] = new MetadataType(MetadataTypes.PROFILE, true);
-        let response = await cliManager.retrieveMixedSpecialMetadata(false, types, (data) => { 
-            //console.log(data);
-        });
+        let response = await cliManager.retrieveMixedSpecialMetadata(false, types);
         try{
             cliManager.setProjectFolder('./test/assets/SFDXProjects');
-            response = await cliManager.retrieveMixedSpecialMetadata(false, types, (data) => { 
-                //console.log(data);
-            });
+            response = await cliManager.retrieveMixedSpecialMetadata(false, types);
         } catch(error){
 
         }
@@ -164,14 +144,10 @@ describe('Testing ./index.js', () => {
         cliManager.setSortOrder('simpleFirst');
         cliManager.setIgnoreFile('./test/assets/SFDXProject/.ahignore.json');
         cliManager.setOutputPath('./test/assets/SFDXProject/manifest');
-        let response = await cliManager.loadUserPermissions((data) => { 
-            //console.log(data);
-        });
+        let response = await cliManager.loadUserPermissions();
         try{
             cliManager.setProjectFolder('./test/assets/SFDXProjects');
-            response = await cliManager.loadUserPermissions((data) => { 
-                //console.log(data);
-            });
+            response = await cliManager.loadUserPermissions();
         } catch(error){
 
         }
@@ -186,14 +162,10 @@ describe('Testing ./index.js', () => {
         cliManager.setCompressFiles(true);
         cliManager.setSortOrder('simpleFirst');
         cliManager.setOutputPath('./test/assets/SFDXProject/manifest');
-        await cliManager.ignoreMetadata(['Profile'], (data) => { 
-            //console.log(data);
-        });
+        await cliManager.ignoreMetadata(['Profile']);
         try{
             cliManager.setProjectFolder('./test/assets/SFDXProjects');
-            response = await cliManager.ignoreMetadata(['Profile'], (data) => { 
-                //console.log(data);
-            });
+            response = await cliManager.ignoreMetadata(['Profile']);
         } catch(error){
 
         }
@@ -209,9 +181,7 @@ describe('Testing ./index.js', () => {
         cliManager.setSortOrder('simpleFirst');
         cliManager.setIgnoreFile('./test/assets/SFDXProject/.ahignore.json');
         cliManager.setOutputPath('./test/assets/SFDXProject/manifest');
-        let response = await cliManager.isAuraHelperCLIInstalled( (data) => { 
-
-        });
+        let response = await cliManager.isAuraHelperCLIInstalled();
         console.log('Is Installed: ' + response);
         //console.log(response);
         done();
@@ -225,9 +195,7 @@ describe('Testing ./index.js', () => {
         cliManager.setSortOrder('simpleFirst');
         cliManager.setIgnoreFile('./test/assets/SFDXProject/.ahignore.json');
         cliManager.setOutputPath('./test/assets/SFDXProject/manifest');
-        let response = await cliManager.getAuraHelperCLIVersion( (data) => { 
-
-        });
+        let response = await cliManager.getAuraHelperCLIVersion();
         console.log(response);
         done();
     }, 30000000);
@@ -239,21 +207,15 @@ describe('Testing ./index.js', () => {
         cliManager.setCompressFiles(true);
         cliManager.setSortOrder('simpleFirst');
         cliManager.setOutputPath('D:/Workspace/NodeJS/Aura Helper Framework/ah-cli-manager/test/assets/SFDXProject/manifest');
-        let response = await cliManager.describeLocalMetadata(undefined, (data) => { 
-
-        });
+        let response = await cliManager.describeLocalMetadata(undefined);
         try{
-            response = await cliManager.describeLocalMetadata(undefined, (data) => { 
-                cliManager.abortProcess();
-            });
+            response = await cliManager.describeLocalMetadata(undefined);
         } catch(error){
 
         }
         try{
             cliManager.setProjectFolder('./test/assets/SFDXProjects');
-            response = await cliManager.describeLocalMetadata(undefined, (data) => { 
-                //console.log(data);
-            });
+            response = await cliManager.describeLocalMetadata(undefined);
         } catch(error){
 
         }
@@ -267,14 +229,10 @@ describe('Testing ./index.js', () => {
         cliManager.setCompressFiles(true);
         cliManager.setSortOrder('simpleFirst');
         cliManager.setOutputPath('D:/Workspace/NodeJS/Aura Helper Framework/ah-cli-manager/test/assets/SFDXProject/manifest');
-        let response = await cliManager.describeOrgMetadata(false, undefined, (data) => { 
-
-        });
+        let response = await cliManager.describeOrgMetadata(false, undefined);
         try{
             cliManager.setProjectFolder('./test/assets/SFDXProjects');
-            response = await cliManager.describeOrgMetadata(false, undefined, (data) => { 
-                //console.log(data);
-            });
+            response = await cliManager.describeOrgMetadata(false, undefined);
         } catch(error){
 
         }
@@ -289,14 +247,10 @@ describe('Testing ./index.js', () => {
         cliManager.setSortOrder('simpleFirst');
         cliManager.setIgnoreFile('./test/assets/SFDXProject/.ahignore.json');
         cliManager.setOutputPath('D:/Workspace/NodeJS/Aura Helper Framework/ah-cli-manager/test/assets/SFDXProject/manifest');
-        let response = await cliManager.createPackageFromGit('test', 'origin/master', 'both', 'after', false, (data) => { 
-
-        });
+        let response = await cliManager.createPackageFromGit('test', 'origin/master', 'both', 'after', false);
         try{
             cliManager.setOutputPath('./test/assets/SFDXProject/manifest');
-            response = await cliManager.createPackageFromGit('test', 'origin/master', 'both', 'after', false, (data) => { 
-                //console.log(data);
-            });
+            response = await cliManager.createPackageFromGit('test', 'origin/master', 'both', 'after', false);
         } catch(error){
 
         }
@@ -358,14 +312,10 @@ describe('Testing ./index.js', () => {
             '../files/destructiveChangesPost1.xml',
             '../files/destructiveChangesPost2.xml'
         ];
-        let response = await cliManager.createPackageFromOtherPackages(packages, 'both', 'after', false, (data) => { 
-            //console.log(data);
-        });
+        let response = await cliManager.createPackageFromOtherPackages(packages, 'both', 'after', false);
         try{
             cliManager.setOutputPath('./test/assets/SFDXProject/manifest');
-            response = await cliManager.createPackageFromOtherPackages(packages, 'both', 'after', false, (data) => { 
-                //console.log(data);
-            });
+            response = await cliManager.createPackageFromOtherPackages(packages, 'both', 'after', false);
         } catch(error){
 
         }
