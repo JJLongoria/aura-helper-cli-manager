@@ -35,7 +35,7 @@ class CLIManager {
         this.namespacePrefix = (namespacePrefix !== undefined) ? namespacePrefix : '';
         this.compressFiles = false;
         this.sortOrder;
-        this.ignoreFile;
+        this.ignoreFile = this.projectFolder + '/.ahignore.json';
         this.outputPath;
 
         this._inProgress = false;
