@@ -1,10 +1,10 @@
 const EventEmitter = require('events').EventEmitter;
-const { ProcessHandler, ProcessFactory } = require('@ah/core').ProcessManager;
-const { Validator, Utils, MetadataUtils, StrUtils } = require('@ah/core').CoreUtils;
-const { AuraHelperCLIResponse, RetrieveResult, PackageGeneratorResult } = require('@ah/core').Types;
-const { FileChecker } = require('@ah/core').FileSystem;
-const MetadataFactory = require('@ah/metadata-factory');
-const { CLIManagerException, OperationNotSupportedException, DataNotFoundException, WrongDatatypeException } = require('@ah/core').Exceptions;
+const { ProcessHandler, ProcessFactory } = require('@aurahelper/core').ProcessManager;
+const { Validator, Utils, MetadataUtils, StrUtils } = require('@aurahelper/core').CoreUtils;
+const { AuraHelperCLIResponse, RetrieveResult, PackageGeneratorResult } = require('@aurahelper/core').Types;
+const { FileChecker } = require('@aurahelper/core').FileSystem;
+const MetadataFactory = require('@aurahelper/metadata-factory');
+const { CLIManagerException, OperationNotSupportedException, DataNotFoundException, WrongDatatypeException } = require('@aurahelper/core').Exceptions;
 
 const EVENT = {
     ABORT: 'abort',

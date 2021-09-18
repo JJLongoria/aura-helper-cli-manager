@@ -1,7 +1,7 @@
 const AHCLIManager = require('../index');
-const { FileWriter } = require('@ah/core').FileSystem;
-const { MetadataType, MetadataObject, MetadataItem } = require('@ah/core').Types;
-const { MetadataTypes } = require('@ah/core').Values;
+const { FileWriter } = require('@aurahelper/core').FileSystem;
+const { MetadataType, MetadataObject, MetadataItem } = require('@aurahelper/core').Types;
+const { MetadataTypes } = require('@aurahelper/core').Values;
 
 describe('Testing ./index.js', () => {
     test('Testing compress()', async (done) => {
@@ -162,6 +162,7 @@ describe('Testing ./index.js', () => {
         cliManager.setCompressFiles(true);
         cliManager.setSortOrder('simpleFirst');
         cliManager.setOutputPath('./test/assets/SFDXProject/manifest');
+        cliManager.setIgnoreFile('.ahignore.json');
         await cliManager.ignoreMetadata(['Profile']);
         try{
             cliManager.setProjectFolder('./test/assets/SFDXProjects');

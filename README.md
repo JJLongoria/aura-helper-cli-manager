@@ -213,7 +213,7 @@ Returns the cli manager object
 ### **Examples:**
 **Set CLI Manager API version**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager();
 
@@ -234,7 +234,7 @@ Returns the cli manager object
 ### **Examples:**
 **Set CLI Manager project folder**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager();
 
@@ -258,7 +258,7 @@ Returns the cli manager object
 ### **Examples:**
 **Set CLI Manager namespace prefix**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager();
 
@@ -282,7 +282,7 @@ Returns the cli manager object
 ### **Examples:**
 **Set CLI Manager compress files**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager();
 
@@ -306,7 +306,7 @@ Returns the cli manager object
 ### **Examples:**
 **Set CLI Manager compress files**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager();
 
@@ -330,7 +330,7 @@ Returns the cli manager object
 ### **Examples:**
 **Set CLI Manager ignore file**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager();
 
@@ -354,7 +354,7 @@ Returns the cli manager object
 ### **Examples:**
 **Set CLI Manager ignore file**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager();
 
@@ -378,7 +378,7 @@ Returns the cli manager object
 ### **Examples:**
 **Set CLI Manager on progress callback**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager();
 
@@ -406,7 +406,7 @@ Returns the cli manager object
 ### **Examples:**
 **Set CLI Manager on aport callback**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager();
 
@@ -426,7 +426,7 @@ Method to abort all CLI Manager running processes. When finishes call onAbort() 
 ### **Examples:**
 **Abort CLI Manager running processes**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager();
 
@@ -470,7 +470,7 @@ This method can throw the next exceptions:
 ### **Examples:**
 **Compress a single XML file**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
 
@@ -484,7 +484,7 @@ This method can throw the next exceptions:
 
 **Compress an entire folder and subfolders**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
 
@@ -498,7 +498,7 @@ This method can throw the next exceptions:
 
 **Compress a file list**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
 
@@ -541,7 +541,7 @@ This method can throw the next exceptions:
 ### **Examples:**
 **Compare local project with org**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
 
@@ -580,7 +580,7 @@ This method can throw the next exceptions:
 ### **Examples:**
 **Compare the project org with another org**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
 
@@ -592,7 +592,7 @@ This method can throw the next exceptions:
 
 **Compare two different orgs**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
 
@@ -629,7 +629,7 @@ This method can throw the next exceptions:
 ### **Examples:**
 **Describe all local metadata types**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
 
@@ -641,7 +641,7 @@ This method can throw the next exceptions:
 
 **Describe some local metadata types**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
 
@@ -687,7 +687,7 @@ This method can throw the next exceptions:
 ### **Examples:**
 **Describe all org metadata types**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
 
@@ -699,7 +699,7 @@ This method can throw the next exceptions:
 
 **Describe some org metadata types**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
 
@@ -747,7 +747,7 @@ This method can throw the next exceptions:
 ### **Examples:**
 **Retrieve all local special metadata types**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
 
@@ -759,7 +759,7 @@ This method can throw the next exceptions:
 
 **Retrieve some local special metadata types**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
 
@@ -804,7 +804,7 @@ This method can throw the next exceptions:
 ### **Examples:**
 **Retrieve all org special metadata types from org namespace**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
 
@@ -816,7 +816,7 @@ This method can throw the next exceptions:
 
 **Retrieve some org special metadata types from org namespace**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
 
@@ -861,7 +861,7 @@ This method can throw the next exceptions:
 ### **Examples:**
 **Retrieve all mixed special metadata types from org namespace**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
 
@@ -873,7 +873,7 @@ This method can throw the next exceptions:
 
 **Retrieve some mixed special metadata types from org namespace**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
 
@@ -908,7 +908,7 @@ This method can throw the next exceptions:
 ### **Examples:**
 **Load available user permissions from project org**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
 
@@ -955,7 +955,7 @@ This method can throw the next exceptions:
 ### **Examples:**
 **Create package and destructive files from changes between two branches**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
 
@@ -972,7 +972,7 @@ This method can throw the next exceptions:
 
 **Create package file from changes between two branches**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
 
@@ -1021,7 +1021,7 @@ This method can throw the next exceptions:
 ### **Examples:**
 **Create package file from Metadata JSON File**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
 
@@ -1037,7 +1037,7 @@ This method can throw the next exceptions:
 
 **Create destructive file from Metadata JSON File**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
 
@@ -1084,7 +1084,7 @@ This method can throw the next exceptions:
 ### **Examples:**
 **Create package file from other package files**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
 
@@ -1106,7 +1106,7 @@ This method can throw the next exceptions:
 
 **Create destructive file from other package files**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
 
@@ -1151,7 +1151,7 @@ This method can throw the next exceptions:
 ### **Examples:**
 **Ignore all metadata types from ignore file**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
 
@@ -1163,7 +1163,7 @@ This method can throw the next exceptions:
 
 **Ignore some metadata types from ignore file**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
 
@@ -1212,7 +1212,7 @@ This method can throw the next exceptions:
 ### **Examples:**
 **Repair all metadata types**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
 
@@ -1224,7 +1224,7 @@ This method can throw the next exceptions:
 
 **Repair some metadata types**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
 
@@ -1244,7 +1244,7 @@ This method can throw the next exceptions:
 
 **Check dependencies errors**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
 
@@ -1272,7 +1272,7 @@ This method can throw the next exceptions:
 ### **Examples:**
 **Check if Aura Helper is installed**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
 
@@ -1303,7 +1303,7 @@ This method can throw the next exceptions:
 ### **Examples:**
 **Check if Aura Helper is installed**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
 
@@ -1331,7 +1331,7 @@ This method can throw the next exceptions:
 ### **Examples:**
 **Update Aura Helper CLI**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
 
@@ -1359,7 +1359,7 @@ This method can throw the next exceptions:
 ### **Examples:**
 **Update Aura Helper CLI with NPM**
 
-    const CLIManager = require('@ah/cli-manager');
+    const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
 

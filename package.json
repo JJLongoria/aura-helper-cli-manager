@@ -1,6 +1,7 @@
 {
-  "name": "@ah/cli-manager",
+  "name": "@aurahelper/cli-manager",
   "productName": "Aura Helper CLI Manager",
+  "displayName": "Aura Helper Framework CLI Manager",
   "version": "1.0.0",
   "description": "Module to handle Aura Helper CLI processes used in Aura Helper VSCode Extension",
   "main": "index.js",
@@ -46,12 +47,12 @@
     "url": "https://github.com/JJLongoria/aura-helper-cli-manager/issues",
     "email": "juanjoselongoria@gmail.com"
   },
-  "dependencies": {
-    "@ah/core": "file:../ah-core",
-    "@ah/metadata-factory": "file:../ah-metadata-factory"
-  },
   "devDependencies": {
     "@types/jest": "^26.0.20",
     "jest": "^26.6.3"
+  },
+  "dependencies": {
+    "@aurahelper/core": "^1.0.0",
+    "@aurahelper/metadata-factory": "^1.0.0"
   }
 }
