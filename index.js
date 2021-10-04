@@ -855,6 +855,7 @@ class CLIManager {
                 const process = ProcessFactory.isAuraHelperInstalled();
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then(() => {
+                    endOperation(this);
                     resolve(true)
                 }).catch((error) => {
                     endOperation(this);
@@ -884,6 +885,7 @@ class CLIManager {
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
                     handleResponse(response, () => {
+                        endOperation(this);
                         resolve(StrUtils.replace(response, 'Aura Helper CLI Version: v', ''));
                     });
                 }).catch((error) => {
@@ -913,6 +915,7 @@ class CLIManager {
                 const process = ProcessFactory.auraHelperUpdate();
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
+                    endOperation(this);
                     resolve(response);
                 }).catch((error) => {
                     endOperation(this);
@@ -944,6 +947,7 @@ class CLIManager {
                 const process = ProcessFactory.auraHelperUpdateNPM();
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
+                    endOperation(this);
                     resolve(response);
                 }).catch((error) => {
                     endOperation(this);
