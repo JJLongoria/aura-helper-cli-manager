@@ -308,6 +308,7 @@ class CLIManager {
     /**
      * Method to describe the all or selected Metadata Types from your local project
      * @param {Array<String>} [types] List of Metadata Type API Names to describe. Undefined to describe all metadata types
+     * @param {Boolean} [groupGlobalActions] True to group global quick actions on "GlobalActions" group, false to include as object and item.
      * 
      * @returns {Promise<Object>} Return a promise with a Metadata JSON Object with the selected Metadata Types data
      * 
@@ -319,13 +320,13 @@ class CLIManager {
      * @throws {InvalidDirectoryPathException} If the project folder path is not a directory
      * @throws {WrongDatatypeException} If the api version is not a Number or String. Can be undefined
      */
-    describeLocalMetadata(types) {
+    describeLocalMetadata(types, groupGlobalActions) {
         startOperation(this);
         return new Promise((resolve, reject) => {
             try {
                 types = transformTypesToAHCLIInput(types, true);
                 const projectFolder = Validator.validateFolderPath(this.projectFolder);
-                const process = ProcessFactory.auraHelperDescribeMetadata(projectFolder, { fromOrg: false, types: types, apiVersion: this.apiVersion }, (ahCliProgress) => {
+                const process = ProcessFactory.auraHelperDescribeMetadata(projectFolder, { fromOrg: false, types: types, apiVersion: this.apiVersion, groupGlobalActions: groupGlobalActions }, (ahCliProgress) => {
                     this._event.emit(EVENT.PROGRESS, ahCliProgress);
                 })
                 addProcess(this, process);
@@ -349,6 +350,7 @@ class CLIManager {
      * Method to describe the all or selected Metadata Types from your project org
      * @param {Boolean} [downloadAll] True to download all Metadata types from all namespaces, false to download only data from org namespace
      * @param {Array<String>} [types] List of Metadata Type API Names to describe. Undefined to describe all metadata types
+     * @param {Boolean} [groupGlobalActions] True to group global quick actions on "GlobalActions" group, false to include as object and item.
      * 
      * @returns {Promise<Object>} Return a promise with a Metadata JSON Object with the selected Metadata Types data
      * 
@@ -360,7 +362,7 @@ class CLIManager {
      * @throws {InvalidDirectoryPathException} If the project folder path is not a directory
      * @throws {WrongDatatypeException} If the api version is not a Number or String. Can be undefined
      */
-    describeOrgMetadata(downloadAll, types) {
+    describeOrgMetadata(downloadAll, types, groupGlobalActions) {
         startOperation(this);
         return new Promise((resolve, reject) => {
             try {
@@ -370,7 +372,8 @@ class CLIManager {
                     fromOrg: true,
                     downloadAll: downloadAll,
                     types: types,
-                    apiVersion: this.apiVersion
+                    apiVersion: this.apiVersion,
+                    groupGlobalActions: groupGlobalActions
                 }, (ahCliProgress) => {
                     this._event.emit(EVENT.PROGRESS, ahCliProgress);
                 });
