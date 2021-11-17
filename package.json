@@ -52,7 +52,7 @@
     "jest": "^26.6.3"
   },
   "dependencies": {
-    "@aurahelper/core": "^1.0.0",
-    "@aurahelper/metadata-factory": "^1.0.0"
+    "@aurahelper/core": "^1.0.13",
+    "@aurahelper/metadata-factory": "^1.0.9"
   }
 }
