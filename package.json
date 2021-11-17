@@ -2,7 +2,7 @@
   "name": "@aurahelper/cli-manager",
   "productName": "Aura Helper CLI Manager",
   "displayName": "Aura Helper Framework CLI Manager",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Module to handle Aura Helper CLI processes used in Aura Helper VSCode Extension",
   "main": "index.js",
   "scripts": {
