@@ -1,4 +1,14 @@
 # **Aura Helper CLI Manager Module**
+
+[![Version](https://img.shields.io/npm/v/@aurahelper/core?logo=npm)](https://www.npmjs.com/package/@aurahelper/core)
+[![Total Downloads](https://img.shields.io/npm/dt/@aurahelper/core?logo=npm)](https://www.npmjs.com/package/@aurahelper/core)
+[![Downloads/Month](https://img.shields.io/npm/dm/@aurahelper/core?logo=npm)](https://www.npmjs.com/package/@aurahelper/core)
+[![Issues](https://img.shields.io/github/issues/jjlongoria/aura-helper-core)](https://github.com/JJLongoria/aura-helper-core/issues)
+[![Known Vulnerabilities](https://snyk.io/test/github/JJLongoria/aura-helper-core/badge.svg)](https://snyk.io/test/github/JJLongoria/aura-helper-core)
+[![Code Size](https://img.shields.io/github/languages/code-size/jjlongoria/aura-helper-core)](https://github.com/JJLongoria/aura-helper-core)
+[![License](https://img.shields.io/github/license/jjlongoria/aura-helper-core?logo=github)](https://github.com/JJLongoria/aura-helper-core/blob/master/LICENSE)
+
+
 Module to create and handle Aura Helper CLI processes. With this module you can execute all CLI operations and handle the processes progress easy with the callbacks functions.
 
 Aura Helper CLI is a Command Line Interface application to work with Salesforce projects. Is specially designed to DevOps workflows and Continous Integration.
