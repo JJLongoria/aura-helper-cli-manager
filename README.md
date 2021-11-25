@@ -50,31 +50,31 @@ The fields that start with _ are for internal use only (Does not modify this fie
 
 ### [**projectFolder**](#connection-class-fields-projectFolder)
 Path to the local project root folder
-- String
+- `String`
 
 ### [**apiVersion**](#connection-class-fields-apiVersion)
 API Version number to run processes and connect to salesforce
-- String | Number
+- `String` | `Number`
 
 ### [**namespacePrefix**](#connection-class-fields-namespacePrefix)
 Namespace prefix from the Org 
-- String
+- `String`
 
 ### [**compressFiles**](#connection-class-fields-compressFiles)
 True to compress all affected files when execute CLI Processes, false in otherwise 
-- Boolean
+- `Boolean`
 
 ### [**sortOrder**](#connection-class-fields-sortOrder)
 Sort order value to sort the compresses files
-- String
+- `String`
 
 ### [**ignoreFile**](#connection-class-fields-ignoreFile)
 Path to the ignore file to use on all processes that can ignore metadata
-- String
+- `String`
 
 ### [**outputPath**](#connection-class-fields-outputPath)
 Path to the folder to save all outputs from commands when choose save output into a file.
-- String
+- `String`
 
 </br>
 
@@ -86,11 +86,11 @@ Constructor to create a new CLI Manager object. All parameters are optional and 
 
 ### **Parameters:**
   - **projectFolder**: Path to the local project root folder
-    - String
+    - `String`
   - **apiVersion**: API Version number to run processes and connect to salesforce
-    - String | Number
+    - `String` | `Number`
   - **namespacePrefix**: Namespace prefix from the Org
-    - String
+    - `String`
 
 </br>
 
@@ -214,20 +214,22 @@ Method to set the API Version number to execute some Aura Helper CLI Processes
 
 ### **Parameters:**
   - **apiVersion**: API Version number to run processes and connect to salesforce
-    - String
+    - `String`
 
 ### **Return:**
 Returns the cli manager object
-- CLIManager
+- `CLIManager`
 
 ### **Examples:**
 **Set CLI Manager API version**
-
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager();
 
     cliManager.setApiVersion(50); 
+```
+
 ---
 
 ## [**setProjectFolder(apiVersion)**](#setprojectfolderapiversion)
@@ -235,15 +237,15 @@ Method to set the local root project path to execute all Aura Helper CLI Process
 
 ### **Parameters:**
   - **apiVersion**: Path to the local project root folder. './' by default
-    - String
+    - `String`
 
 ### **Return:**
 Returns the cli manager object
-- CLIManager
+- `CLIManager`
 
 ### **Examples:**
 **Set CLI Manager project folder**
-
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager();
@@ -252,6 +254,7 @@ Returns the cli manager object
 
     // Or can concatenate method calls because setters return a cli manager object
     cliManager.setApiVersion(50).setProjectFolder('path/to/root/project/folder'); 
+```
 ---
 
 ## [**setNamespacePrefix(namespacePrefix)**](#setnamespaceprefixnamespaceprefix)
@@ -259,15 +262,16 @@ Method to set the Namespace prefix from the project org
 
 ### **Parameters:**
   - **namespacePrefix**: Namespace prefix from the Org
-    - String
+    - `String`
 
 ### **Return:**
 Returns the cli manager object
-- CLIManager
+- `CLIManager`
 
 ### **Examples:**
 **Set CLI Manager namespace prefix**
 
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager();
@@ -275,7 +279,8 @@ Returns the cli manager object
     cliManager.setNamespacePrefix('NSPrefix'); 
 
     // Or can concatenate method calls because setters return a cli manager object
-    cliManager.setApiVersion(50).setNamespacePrefix('NSPrefix'); 
+    cliManager.setApiVersion(50).setNamespacePrefix('NSPrefix');
+``` 
 ---
 
 ## [**setCompressFiles(compressFiles)**](#setcompressfilescompressfiles)
@@ -283,15 +288,15 @@ Method to set if compress the affected files by Aura Helper processes
 
 ### **Parameters:**
   - **compressFiles**: True to compress all affected files by Aura Helper proceses, false in otherwise
-    - Boolean
+    - `Boolean`
 
 ### **Return:**
 Returns the cli manager object
-- CLIManager
+- `CLIManager`
 
 ### **Examples:**
 **Set CLI Manager compress files**
-
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager();
@@ -300,6 +305,7 @@ Returns the cli manager object
 
     // Or can concatenate method calls because setters return a cli manager object
     cliManager.setApiVersion(50).setCompressFiles(true); 
+```
 ---
 
 ## [**setSortOrder(sortOrder)**](#setsortordersortorder)
@@ -307,15 +313,16 @@ Method to set the sort order when compress XML Files
 
 ### **Parameters:**
   - **sortOrder**: Sort order value
-    - String
+    - `String`
 
 ### **Return:**
 Returns the cli manager object
-- CLIManager
+- `CLIManager`
 
 ### **Examples:**
 **Set CLI Manager compress files**
 
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager();
@@ -324,6 +331,7 @@ Returns the cli manager object
 
     // Or can concatenate method calls because setters return a cli manager object
     cliManager.setApiVersion(50).setSortOrder('alphabetDesc'); 
+```
 ---
 
 ## [**setIgnoreFile(ignoreFile)**](#setignorefileignorefile)
@@ -331,15 +339,16 @@ Method to set the ignore file path to use on some Aura Helper CLI Processes
 
 ### **Parameters:**
   - **ignoreFile**: Path to the ignore file
-    - String
+    - `String`
 
 ### **Return:**
 Returns the cli manager object
-- CLIManager
+- `CLIManager`
 
 ### **Examples:**
 **Set CLI Manager ignore file**
 
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager();
@@ -348,6 +357,7 @@ Returns the cli manager object
 
     // Or can concatenate method calls because setters return a cli manager object
     cliManager.setApiVersion(50).setIgnoreFile('path/to/ignore/file.json'); 
+```
 ---
 
 ## [**setOutputPath(outputPath)**](#setoutputpathoutputpath)
@@ -355,15 +365,16 @@ Method to set the output folder path to redirect the response to files
 
 ### **Parameters:**
   - **outputPath**: Path to the output folder
-    - String
+    - `String`
 
 ### **Return:**
 Returns the cli manager object
-- CLIManager
+- `CLIManager`
 
 ### **Examples:**
 **Set CLI Manager ignore file**
 
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager();
@@ -372,6 +383,7 @@ Returns the cli manager object
 
     // Or can concatenate method calls because setters return a cli manager object
     cliManager.setApiVersion(50).setOutputPath('path/to/ignore/output/path'); 
+```
 ---
 
 ## [**onProgress(callback)**](#onprogresscallback)
@@ -379,15 +391,16 @@ Method to handle the progress event to handle AHCLI Progression
 
 ### **Parameters:**
   - **callback**: Callback function to handle the progress
-    - Function
+    - `Function`
 
 ### **Return:**
 Returns the cli manager object
-- CLIManager
+- `CLIManager`
 
 ### **Examples:**
 **Set CLI Manager on progress callback**
 
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager();
@@ -400,6 +413,7 @@ Returns the cli manager object
     cliManager.setApiVersion(50).onProgress((status) => {
 
     }); 
+```
 ---
 
 ## [**onAbort(callback)**](#onabortcallback)
@@ -407,15 +421,16 @@ Method to handle the event when CLIManager processes are aborted
 
 ### **Parameters:**
   - **callback**: Callback function to call when CLI Manager is aborted
-    - Function
+    - `Function`
 
 ### **Return:**
 Returns the cli manager object
-- CLIManager
+- `CLIManager`
 
 ### **Examples:**
 **Set CLI Manager on aport callback**
 
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager();
@@ -428,6 +443,7 @@ Returns the cli manager object
     cliManager.setApiVersion(50).onAbort(() => {
 
     }); 
+```
 ---
 
 ## [**abortProcess()**](#abortprocess)
@@ -436,6 +452,7 @@ Method to abort all CLI Manager running processes. When finishes call onAbort() 
 ### **Examples:**
 **Abort CLI Manager running processes**
 
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager();
@@ -445,6 +462,7 @@ Method to abort all CLI Manager running processes. When finishes call onAbort() 
     }); 
 
     cliManager.abortProcess(); 
+```
 ---
 
 ## [**compress(filesOrFolders, sortOrder)**](#compressfilesorfolders-sortorder)
@@ -452,34 +470,35 @@ Method to compress a single file or folder or array with files to compress (comp
 
 ### **Parameters:**
   - **filesOrFolders**: file path or paths to compress or folder path to compress
-    - String | Array\<String\>
+    - `String` | `Array<String>`
   - **sortOrder**: Sort order value to sort XML Elements compress
-    - String
+    - `String`
 
 ### **Return:**
 Return an empty promise when compress files finish succesfully
-- Promise\<Any\>
+- Promise<Any>
 
 ### **Throws:**
 This method can throw the next exceptions:
 
-- **CLIManagerException**: If run other cli manager process when has one process running or Aura Helper CLI Return an error  
-- **DataRequiredException**: If required data is not provided
-- **OSNotSupportedException**: When run this processes with not supported operative system
-- **OperationNotSupportedException**: If try to compress more than one folder, or file and folders at the same time
-- **DataNotFoundException**: If not found file or folder paths
-- **WrongDirectoryPathException**: If the folder path is not a String or can't convert to absolute path
-- **DirectoryNotFoundException**: If the folder path not exists or not have access to it
-- **InvalidDirectoryPathException**: If the project folder or package folder is not a directory
-- **WrongFilePathException**: If the file is not a String or can't convert to absolute path
-- **FileNotFoundException**: If the file not exists or not have access to it
-- **InvalidFilePathException**: If the file is not a file
-- **WrongDatatypeException**: If the api version is not a Number or String. Can be undefined
+- **`CLIManagerException`**: If run other cli manager process when has one process running or Aura Helper CLI Return an error  
+- **`DataRequiredException`**: If required data is not provided
+- **`OSNotSupportedException`**: When run this processes with not supported operative system
+- **`OperationNotSupportedException`**: If try to compress more than one folder, or file and folders at the same time
+- **`DataNotFoundException`**: If not found file or folder paths
+- **`WrongDirectoryPathException`**: If the folder path is not a String or can't convert to absolute path
+- **`DirectoryNotFoundException`**: If the folder path not exists or not have access to it
+- **`InvalidDirectoryPathException`**: If the project folder or package folder is not a directory
+- **`WrongFilePathException`**: If the file is not a String or can't convert to absolute path
+- **`FileNotFoundException`**: If the file not exists or not have access to it
+- **`InvalidFilePathException`**: If the file is not a file
+- **`WrongDatatypeException`**: If the api version is not a Number or String. Can be undefined
 
 
 ### **Examples:**
 **Compress a single XML file**
 
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
@@ -491,9 +510,11 @@ This method can throw the next exceptions:
     }).catch((error) => {
         // Handle error
     }); 
+```
 
 **Compress an entire folder and subfolders**
 
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
@@ -505,9 +526,11 @@ This method can throw the next exceptions:
     }).catch((error) => {
         // Handle error
     }); 
+```
 
 **Compress a file list**
 
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
@@ -525,32 +548,31 @@ This method can throw the next exceptions:
     }).catch((error) => {
         // Handle error
     }); 
+```
 ---
 
 ## [**compareWithOrg()**](#comparewithorg)
 Method to compare the local project with the project auth org. Return the Metadata Types that exists on Org and not exists on local project. See [Metadata JSON Format](#metadata-file) section to understand the JSON Metadata Format
 
-### **Parameters:**
-
 ### **Return:**
 Return a promise with a JSON Metadata Object with the data respose. Contains the Metadata Types that exists on the project org and not in the local project.
-- Promise\<Object\>
+- `Promise<Object>`
 
 ### **Throws:**
 This method can throw the next exceptions:
 
-- **CLIManagerException**: If run other cli manager process when has one process running or Aura Helper CLI Return an error  
-- **DataRequiredException**: If required data is not provided
-- **OSNotSupportedException**: When run this processes with not supported operative system
-- **WrongDirectoryPathException**: If the folder path is not a String or can't convert to absolute path
-- **DirectoryNotFoundException**: If the folder path not exists or not have access to it
-- **InvalidDirectoryPathException**: If the project folder or package folder is not a directory
-- **WrongDatatypeException**: If the api version is not a Number or String. Can be undefined
+- **`CLIManagerException`**: If run other cli manager process when has one process running or Aura Helper CLI Return an error  
+- **`DataRequiredException`**: If required data is not provided
+- **`OSNotSupportedException`**: When run this processes with not supported operative system
+- **`WrongDirectoryPathException`**: If the folder path is not a String or can't convert to absolute path
+- **`DirectoryNotFoundException`**: If the folder path not exists or not have access to it
+- **`InvalidDirectoryPathException`**: If the project folder or package folder is not a directory
+- **`WrongDatatypeException`**: If the api version is not a Number or String. Can be undefined
 
 
 ### **Examples:**
 **Compare local project with org**
-
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
@@ -560,6 +582,7 @@ This method can throw the next exceptions:
     }).catch((error) => {
         // Handle error
     });
+```
 ---
 
 ## [**compareOrgBetween(source, target)**](#compareorgbetweensource-target)
@@ -567,29 +590,30 @@ Method to compare between two orgs. Return the Metadata Types that exists on tar
 
 ### **Parameters:**
   - **source**: Source org Username or Alias to compare. If undefined, use the local project auth org as source 
-    - String
+    - `String`
   - **target**: Target org Username or Alias to compare. (Require)
-    - String
+    - `String`
 
 ### **Return:**
 Return a promise with a JSON Metadata Object with the data respose. Contains the Metadata Types that exists on target and not on source.
-- Promise\<Object\>
+- `Promise<Object>`
 
 ### **Throws:**
 This method can throw the next exceptions:
 
-- **CLIManagerException**: If run other cli manager process when has one process running or Aura Helper CLI Return an error  
-- **DataRequiredException**: If required data is not provided
-- **OSNotSupportedException**: When run this processes with not supported operative system
-- **WrongDirectoryPathException**: If the folder path is not a String or can't convert to absolute path
-- **DirectoryNotFoundException**: If the folder path not exists or not have access to it
-- **InvalidDirectoryPathException**: If the project folder or package folder is not a directory
-- **WrongDatatypeException**: If the api version is not a Number or String. Can be undefined
+- **`CLIManagerException`**: If run other cli manager process when has one process running or Aura Helper CLI Return an error  
+- **`DataRequiredException`**: If required data is not provided
+- **`OSNotSupportedException`**: When run this processes with not supported operative system
+- **`WrongDirectoryPathException`**: If the folder path is not a String or can't convert to absolute path
+- **`DirectoryNotFoundException`**: If the folder path not exists or not have access to it
+- **`InvalidDirectoryPathException`**: If the project folder or package folder is not a directory
+- **`WrongDatatypeException`**: If the api version is not a Number or String. Can be undefined
 
 
 ### **Examples:**
 **Compare the project org with another org**
 
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
@@ -599,9 +623,10 @@ This method can throw the next exceptions:
     }).catch((error) => {
         // Handle error
     });
+```
 
 **Compare two different orgs**
-
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
@@ -611,6 +636,7 @@ This method can throw the next exceptions:
     }).catch((error) => {
         // Handle error
     });
+```
 ---
 
 ## [**describeLocalMetadata(types)**](#describelocalmetadatatypes)
@@ -618,27 +644,27 @@ Method to describe the all or selected Metadata Types from your local project. S
 
 ### **Parameters:**
   - **types**: List of Metadata Type API Names to describe. Undefined to describe all local metadata types 
-    - Array\<String\>
+    - `Array<String>`
 
 ### **Return:**
 Return a promise with a Metadata JSON Object with the selected Metadata Types data
-- Promise\<Object\>
+- `Promise<Object>`
 
 ### **Throws:**
 This method can throw the next exceptions:
 
-- **CLIManagerException**: If run other cli manager process when has one process running or Aura Helper CLI Return an error  
-- **DataRequiredException**: If required data is not provided
-- **OSNotSupportedException**: When run this processes with not supported operative system
-- **WrongDirectoryPathException**: If the folder path is not a String or can't convert to absolute path
-- **DirectoryNotFoundException**: If the folder path not exists or not have access to it
-- **InvalidDirectoryPathException**: If the project folder or package folder is not a directory
-- **WrongDatatypeException**: If the api version is not a Number or String. Can be undefined
+- **`CLIManagerException`**: If run other cli manager process when has one process running or Aura Helper CLI Return an error  
+- **`DataRequiredException`**: If required data is not provided
+- **`OSNotSupportedException`**: When run this processes with not supported operative system
+- **`WrongDirectoryPathException`**: If the folder path is not a String or can't convert to absolute path
+- **`DirectoryNotFoundException`**: If the folder path not exists or not have access to it
+- **`InvalidDirectoryPathException`**: If the project folder or package folder is not a directory
+- **`WrongDatatypeException`**: If the api version is not a Number or String. Can be undefined
 
 
 ### **Examples:**
 **Describe all local metadata types**
-
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
@@ -648,9 +674,9 @@ This method can throw the next exceptions:
     }).catch((error) => {
         // Handle error
     });
-
+```
 **Describe some local metadata types**
-
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
@@ -667,6 +693,7 @@ This method can throw the next exceptions:
     }).catch((error) => {
         // Handle error
     });
+```
 ---
 
 ## [**describeOrgMetadata(downloadAll, types)**](#describeorgmetadatadownloadall-types)
@@ -674,29 +701,29 @@ Method to describe the all or selected Metadata Types from your project org. See
 
 ### **Parameters:**
   - **downloadAll**: True to download all Metadata types from all namespaces, false to download only data from org namespace 
-    - Boolean
+    - `Boolean`
   - **types**: List of Metadata Type API Names to describe. Undefined to describe all local metadata types
-    - Array\<String\>
+    - `Array<String>`
 
 ### **Return:**
 Return a promise with a Metadata JSON Object with the selected Metadata Types data
-- Promise\<Object\>
+- `Promise<Object>`
 
 ### **Throws:**
 This method can throw the next exceptions:
 
-- **CLIManagerException**: If run other cli manager process when has one process running or Aura Helper CLI Return an error  
-- **DataRequiredException**: If required data is not provided
-- **OSNotSupportedException**: When run this processes with not supported operative system
-- **WrongDirectoryPathException**: If the folder path is not a String or can't convert to absolute path
-- **DirectoryNotFoundException**: If the folder path not exists or not have access to it
-- **InvalidDirectoryPathException**: If the project folder or package folder is not a directory
-- **WrongDatatypeException**: If the api version is not a Number or String. Can be undefined
+- **`CLIManagerException`**: If run other cli manager process when has one process running or Aura Helper CLI Return an error  
+- **`DataRequiredException`**: If required data is not provided
+- **`OSNotSupportedException`**: When run this processes with not supported operative system
+- **`WrongDirectoryPathException`**: If the folder path is not a String or can't convert to absolute path
+- **`DirectoryNotFoundException`**: If the folder path not exists or not have access to it
+- **`InvalidDirectoryPathException`**: If the project folder or package folder is not a directory
+- **`WrongDatatypeException`**: If the api version is not a Number or String. Can be undefined
 
 
 ### **Examples:**
 **Describe all org metadata types**
-
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
@@ -706,9 +733,9 @@ This method can throw the next exceptions:
     }).catch((error) => {
         // Handle error
     });
-
+```
 **Describe some org metadata types**
-
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
@@ -725,6 +752,7 @@ This method can throw the next exceptions:
     }).catch((error) => {
         // Handle error
     });
+```
 ---
 
 ## [**retrieveLocalSpecialMetadata(types)**](#retrievelocalspecialmetadatatypes)
@@ -732,31 +760,31 @@ Method to retrieve all or selected local special types. See [Metadata JSON Forma
 
 ### **Parameters:**
   - **types**: Metadata JSON Object or Metadata JSON file with the selected types to retrieve
-    - String | Object
+    - `String` | `Object`
 
 ### **Return:**
 Return a promise with a RetrieveResult object
-- Promise\<RetrieveResult\>
+- `Promise<RetrieveResult>`
 
 ### **Throws:**
 This method can throw the next exceptions:
 
-- **CLIManagerException**: If run other cli manager process when has one process running or Aura Helper CLI Return an error  
-- **DataRequiredException**: If required data is not provided
-- **OSNotSupportedException**: When run this processes with not supported operative system
-- **WrongDirectoryPathException**: If the folder path is not a String or can't convert to absolute path
-- **DirectoryNotFoundException**: If the folder path not exists or not have access to it
-- **InvalidDirectoryPathException**: If the JSON Metadata file is not a String or can't convert to absolute path
-- **WrongFilePathException**: If the JSON Metadata file not exists or not have access to it
-- **FileNotFoundException**: If the JSON Metadata file is not a file
-- **InvalidFilePathException**: If the folder path not exists or not have access to it
-- **WrongFormatException**: If JSON Metadata file is not a JSON file or not have the correct Metadata JSON format
-- **WrongDatatypeException**: If the api version is not a Number or String. Can be undefined
+- **`CLIManagerException`**: If run other cli manager process when has one process running or Aura Helper CLI Return an error  
+- **`DataRequiredException`**: If required data is not provided
+- **`OSNotSupportedException`**: When run this processes with not supported operative system
+- **`WrongDirectoryPathException`**: If the folder path is not a String or can't convert to absolute path
+- **`DirectoryNotFoundException`**: If the folder path not exists or not have access to it
+- **`InvalidDirectoryPathException`**: If the JSON Metadata file is not a String or can't convert to absolute path
+- **`WrongFilePathException`**: If the JSON Metadata file not exists or not have access to it
+- **`FileNotFoundException`**: If the JSON Metadata file is not a file
+- **`InvalidFilePathException`**: If the folder path not exists or not have access to it
+- **`WrongFormatException`**: If JSON Metadata file is not a JSON file or not have the correct Metadata JSON format
+- **`WrongDatatypeException`**: If the api version is not a Number or String. Can be undefined
 
 
 ### **Examples:**
 **Retrieve all local special metadata types**
-
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
@@ -766,9 +794,9 @@ This method can throw the next exceptions:
     }).catch((error) => {
         // Handle error
     });
-
+```
 **Retrieve some local special metadata types**
-
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
@@ -780,6 +808,7 @@ This method can throw the next exceptions:
     }).catch((error) => {
         // Handle error
     });
+```
 ---
 
 ## [**retrieveOrgSpecialMetadata(downloadAll, types)**](#retrieveorgspecialmetadatadownloadall-types)
@@ -787,33 +816,33 @@ Method to retrieve all or selected special types from org. See [Metadata JSON Fo
 
 ### **Parameters:**
   - **downloadAll**: True to download all Metadata types from all namespaces, false to download only data from org namespace
-    - Boolean
+    - `Boolean`
   - **types**: Metadata JSON Object or Metadata JSON file with the selected types to retrieve
-    - String | Object
+    - `String` | `Object`
 
 ### **Return:**
 Return a promise with a RetrieveResult object
-- Promise\<RetrieveResult\>
+- `Promise<RetrieveResult>`
 
 ### **Throws:**
 This method can throw the next exceptions:
 
-- **CLIManagerException**: If run other cli manager process when has one process running or Aura Helper CLI Return an error  
-- **DataRequiredException**: If required data is not provided
-- **OSNotSupportedException**: When run this processes with not supported operative system
-- **WrongDirectoryPathException**: If the folder path is not a String or can't convert to absolute path
-- **DirectoryNotFoundException**: If the folder path not exists or not have access to it
-- **InvalidDirectoryPathException**: If the JSON Metadata file is not a String or can't convert to absolute path
-- **WrongFilePathException**: If the JSON Metadata file not exists or not have access to it
-- **FileNotFoundException**: If the JSON Metadata file is not a file
-- **InvalidFilePathException**: If the folder path not exists or not have access to it
-- **WrongFormatException**: If JSON Metadata file is not a JSON file or not have the correct Metadata JSON format
-- **WrongDatatypeException**: If the api version is not a Number or String. Can be undefined
+- **`CLIManagerException`**: If run other cli manager process when has one process running or Aura Helper CLI Return an error  
+- **`DataRequiredException`**: If required data is not provided
+- **`OSNotSupportedException`**: When run this processes with not supported operative system
+- **`WrongDirectoryPathException`**: If the folder path is not a String or can't convert to absolute path
+- **`DirectoryNotFoundException`**: If the folder path not exists or not have access to it
+- **`InvalidDirectoryPathException`**: If the JSON Metadata file is not a String or can't convert to absolute path
+- **`WrongFilePathException`**: If the JSON Metadata file not exists or not have access to it
+- **`FileNotFoundException`**: If the JSON Metadata file is not a file
+- **`InvalidFilePathException`**: If the folder path not exists or not have access to it
+- **`WrongFormatException`**: If JSON Metadata file is not a JSON file or not have the correct Metadata JSON format
+- **`WrongDatatypeException`**: If the api version is not a Number or String. Can be undefined
 
 
 ### **Examples:**
 **Retrieve all org special metadata types from org namespace**
-
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
@@ -823,9 +852,9 @@ This method can throw the next exceptions:
     }).catch((error) => {
         // Handle error
     });
-
+```
 **Retrieve some org special metadata types from org namespace**
-
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
@@ -837,6 +866,7 @@ This method can throw the next exceptions:
     }).catch((error) => {
         // Handle error
     });
+```
 ---
 
 ## [**retrieveMixedSpecialMetadata(downloadAll, types)**](#retrievemixedspecialmetadatadownloadall-types)
@@ -844,33 +874,33 @@ Method to retrieve all or selected special types on mixed mode. See [Metadata JS
 
 ### **Parameters:**
   - **downloadAll**: True to download all Metadata types from all namespaces, false to download only data from org namespace
-    - Boolean
+    - `Boolean`
   - **types**: Metadata JSON Object or Metadata JSON file with the selected types to retrieve
-    - String | Object
+    - `String` | `Object`
 
 ### **Return:**
 Return a promise with a RetrieveResult object
-- Promise\<RetrieveResult\>
+- `Promise<RetrieveResult>`
 
 ### **Throws:**
 This method can throw the next exceptions:
 
-- **CLIManagerException**: If run other cli manager process when has one process running or Aura Helper CLI Return an error  
-- **DataRequiredException**: If required data is not provided
-- **OSNotSupportedException**: When run this processes with not supported operative system
-- **WrongDirectoryPathException**: If the folder path is not a String or can't convert to absolute path
-- **DirectoryNotFoundException**: If the folder path not exists or not have access to it
-- **InvalidDirectoryPathException**: If the JSON Metadata file is not a String or can't convert to absolute path
-- **WrongFilePathException**: If the JSON Metadata file not exists or not have access to it
-- **FileNotFoundException**: If the JSON Metadata file is not a file
-- **InvalidFilePathException**: If the folder path not exists or not have access to it
-- **WrongFormatException**: If JSON Metadata file is not a JSON file or not have the correct Metadata JSON format
-- **WrongDatatypeException**: If the api version is not a Number or String. Can be undefined
+- **`CLIManagerException`**: If run other cli manager process when has one process running or Aura Helper CLI Return an error  
+- **`DataRequiredException`**: If required data is not provided
+- **`OSNotSupportedException`**: When run this processes with not supported operative system
+- **`WrongDirectoryPathException`**: If the folder path is not a String or can't convert to absolute path
+- **`DirectoryNotFoundException`**: If the folder path not exists or not have access to it
+- **`InvalidDirectoryPathException`**: If the JSON Metadata file is not a String or can't convert to absolute path
+- **`WrongFilePathException`**: If the JSON Metadata file not exists or not have access to it
+- **`FileNotFoundException`**: If the JSON Metadata file is not a file
+- **`InvalidFilePathException`**: If the folder path not exists or not have access to it
+- **`WrongFormatException`**: If JSON Metadata file is not a JSON file or not have the correct Metadata JSON format
+- **`WrongDatatypeException`**: If the api version is not a Number or String. Can be undefined
 
 
 ### **Examples:**
 **Retrieve all mixed special metadata types from org namespace**
-
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
@@ -880,9 +910,9 @@ This method can throw the next exceptions:
     }).catch((error) => {
         // Handle error
     });
-
+```
 **Retrieve some mixed special metadata types from org namespace**
-
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
@@ -894,6 +924,7 @@ This method can throw the next exceptions:
     }).catch((error) => {
         // Handle error
     });
+```
 ---
 
 ## [**loadUserPermissions()**](#loaduserpermissions)
@@ -901,23 +932,23 @@ Method to load all available user permissions on the project org
 
 ### **Return:**
 Return a promise with the list of available user permission API Names
-- Promise\<Array\<String\>\>
+- `Promise<Array<String>>`
 
 ### **Throws:**
 This method can throw the next exceptions:
 
-- **CLIManagerException**: If run other cli manager process when has one process running or Aura Helper CLI Return an error  
-- **DataRequiredException**: If required data is not provided
-- **OSNotSupportedException**: When run this processes with not supported operative system
-- **WrongDirectoryPathException**: If the folder path is not a String or can't convert to absolute path
-- **DirectoryNotFoundException**: If the folder path not exists or not have access to it
-- **InvalidDirectoryPathException**: If the JSON Metadata file is not a String or can't convert to absolute path
-- **WrongDatatypeException**: If the api version is not a Number or String. Can be undefined
+- **`CLIManagerException`**: If run other cli manager process when has one process running or Aura Helper CLI Return an error  
+- **`DataRequiredException`**: If required data is not provided
+- **`OSNotSupportedException`**: When run this processes with not supported operative system
+- **`WrongDirectoryPathException`**: If the folder path is not a String or can't convert to absolute path
+- **`DirectoryNotFoundException`**: If the folder path not exists or not have access to it
+- **`InvalidDirectoryPathException`**: If the JSON Metadata file is not a String or can't convert to absolute path
+- **`WrongDatatypeException`**: If the api version is not a Number or String. Can be undefined
 
 
 ### **Examples:**
 **Load available user permissions from project org**
-
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
@@ -929,6 +960,7 @@ This method can throw the next exceptions:
     }).catch((error) => {
         // Handle error
     });
+```
 ---
 
 ## [**createPackageFromGit(source, target, createType, deleteOrder, useIgnore)**](#createpackagefromgitsource-target-createtype-deleteorder-useignore)
@@ -936,35 +968,35 @@ Method to create the package XML and destructive XML files from git diffs and ch
 
 ### **Parameters:**
   - **source**: Source tag, branch or commit to compare to create the package and destructive files
-    - String
+    - `String`
   - **target**: Target tag, branch or commit to compare to create the package and destructive files
-    - String
+    - `String`
   - **createType**: Create type option (package, destructive, both)
-    - String
+    - `String`
   - **deleteOrder**: Delete order to create the destructive file (before or after)
-    - String
+    - `String`
   - **useIgnore**: true to use the ignore file when create the package, false in otherwise
-    - Boolean
+    - `Boolean`
 
 ### **Return:**
 Return a promise with the PackageGeneratorResult object with the generated file paths
-- Promise\<PackageGeneratorResult\>
+- `Promise<PackageGeneratorResult>`
 
 ### **Throws:**
 This method can throw the next exceptions:
 
-- **CLIManagerException**: If run other cli manager process when has one process running or Aura Helper CLI Return an error  
-- **DataRequiredException**: If required data is not provided
-- **OSNotSupportedException**: When run this processes with not supported operative system
-- **WrongDirectoryPathException**: If the folder path is not a String or can't convert to absolute path
-- **DirectoryNotFoundException**: If the folder path not exists or not have access to it
-- **InvalidDirectoryPathException**: If the JSON Metadata file is not a String or can't convert to absolute path
-- **WrongDatatypeException**: If the api version is not a Number or String. Can be undefined
+- **`CLIManagerException`**: If run other cli manager process when has one process running or Aura Helper CLI Return an error  
+- **`DataRequiredException`**: If required data is not provided
+- **`OSNotSupportedException`**: When run this processes with not supported operative system
+- **`WrongDirectoryPathException`**: If the folder path is not a String or can't convert to absolute path
+- **`DirectoryNotFoundException`**: If the folder path not exists or not have access to it
+- **`InvalidDirectoryPathException`**: If the JSON Metadata file is not a String or can't convert to absolute path
+- **`WrongDatatypeException`**: If the api version is not a Number or String. Can be undefined
 
 
 ### **Examples:**
 **Create package and destructive files from changes between two branches**
-
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
@@ -979,9 +1011,9 @@ This method can throw the next exceptions:
     }).catch((error) => {
         // Handle error
     });
-
+```
 **Create package file from changes between two branches**
-
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
@@ -995,6 +1027,7 @@ This method can throw the next exceptions:
     }).catch((error) => {
         // Handle error
     });
+```
 ---
 
 ## [**createPackageFromJSON(source, createType, deleteOrder, useIgnore, explicit)**](#createpackagefromjsonsource-createtype-deleteorder-useignore-explicit)
@@ -1002,35 +1035,35 @@ Method to create the package XML or destructive XML file from a Metadata JSON fi
 
 ### **Parameters:**
   - **source**: Metadata JSON file with the selected types to add to the package or destructive file
-    - String
+    - `String`
   - **createType**: Create type value to create Package XML or Destructive XML with the JSON data (package or destructive) 
-    - String
+    - `String`
   - **deleteOrder**: Delete order to create the destructive file (before or after)
-    - String
+    - `String`
   - **useIgnore**: true to use the ignore file when create the package, false in otherwise
-    - Boolean
+    - `Boolean`
   - **explicit**: True to put all metadata type and object names explicit into the package, false to use wildcards if apply (true recommended)
-    - Boolean
+    - `Boolean`
 
 ### **Return:**
 Return a promise with the PackageGeneratorResult object with the generated file paths
-- Promise\<PackageGeneratorResult\>
+- `Promise<PackageGeneratorResult>`
 
 ### **Throws:**
 This method can throw the next exceptions:
 
-- **CLIManagerException**: If run other cli manager process when has one process running or Aura Helper CLI Return an error  
-- **DataRequiredException**: If required data is not provided
-- **OSNotSupportedException**: When run this processes with not supported operative system
-- **WrongDirectoryPathException**: If the folder path is not a String or can't convert to absolute path
-- **DirectoryNotFoundException**: If the folder path not exists or not have access to it
-- **InvalidDirectoryPathException**: If the JSON Metadata file is not a String or can't convert to absolute path
-- **WrongDatatypeException**: If the api version is not a Number or String. Can be undefined
+- **`CLIManagerException`**: If run other cli manager process when has one process running or Aura Helper CLI Return an error  
+- **`DataRequiredException`**: If required data is not provided
+- **`OSNotSupportedException`**: When run this processes with not supported operative system
+- **`WrongDirectoryPathException`**: If the folder path is not a String or can't convert to absolute path
+- **`DirectoryNotFoundException`**: If the folder path not exists or not have access to it
+- **`InvalidDirectoryPathException`**: If the JSON Metadata file is not a String or can't convert to absolute path
+- **`WrongDatatypeException`**: If the api version is not a Number or String. Can be undefined
 
 
 ### **Examples:**
 **Create package file from Metadata JSON File**
-
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
@@ -1044,9 +1077,9 @@ This method can throw the next exceptions:
     }).catch((error) => {
         // Handle error
     });
-
+```
 **Create destructive file from Metadata JSON File**
-
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
@@ -1060,6 +1093,7 @@ This method can throw the next exceptions:
     }).catch((error) => {
         // Handle error
     });
+```
 ---
 
 ## [**createPackageFromOtherPackages(source, createType, deleteOrder, useIgnore, explicit)**](#createpackagefromotherpackagessource-createtype-deleteorder-useignore-explicit)
@@ -1067,33 +1101,33 @@ Method to create the package XML or destructive XML from other Package XML Files
 
 ### **Parameters:**
   - **source**: Path or Paths to the Package XML or Destructive XML files
-    - String | Array\<String\>
+    - `String` | `Array<String>`
   - **createType**: Create type value to create Package XML or Destructive XML with the package data (package or destructive) 
-    - String
+    - `String`
   - **deleteOrder**: Delete order to create the destructive file (before or after)
-    - String
+    - `String`
   - **useIgnore**: true to use the ignore file when create the package, false in otherwise
-    - Boolean
+    - `Boolean`
 
 ### **Return:**
 Return a promise with the PackageGeneratorResult object with the generated file paths
-- Promise\<PackageGeneratorResult\>
+- `Promise<PackageGeneratorResult>`
 
 ### **Throws:**
 This method can throw the next exceptions:
 
-- **CLIManagerException**: If run other cli manager process when has one process running or Aura Helper CLI Return an error  
-- **DataRequiredException**: If required data is not provided
-- **OSNotSupportedException**: When run this processes with not supported operative system
-- **WrongDirectoryPathException**: If the folder path is not a String or can't convert to absolute path
-- **DirectoryNotFoundException**: If the folder path not exists or not have access to it
-- **InvalidDirectoryPathException**: If the JSON Metadata file is not a String or can't convert to absolute path
-- **WrongDatatypeException**: If the api version is not a Number or String. Can be undefined
+- **`CLIManagerException`**: If run other cli manager process when has one process running or Aura Helper CLI Return an error  
+- **`DataRequiredException`**: If required data is not provided
+- **`OSNotSupportedException`**: When run this processes with not supported operative system
+- **`WrongDirectoryPathException`**: If the folder path is not a String or can't convert to absolute path
+- **`DirectoryNotFoundException`**: If the folder path not exists or not have access to it
+- **`InvalidDirectoryPathException`**: If the JSON Metadata file is not a String or can't convert to absolute path
+- **`WrongDatatypeException`**: If the api version is not a Number or String. Can be undefined
 
 
 ### **Examples:**
 **Create package file from other package files**
-
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
@@ -1113,9 +1147,9 @@ This method can throw the next exceptions:
     }).catch((error) => {
         // Handle error
     });
-
+```
 **Create destructive file from other package files**
-
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
@@ -1135,6 +1169,7 @@ This method can throw the next exceptions:
     }).catch((error) => {
         // Handle error
     });
+```
 ---
 
 ## [**ignoreMetadata(types)**](#ignoremetadatatypes)
@@ -1142,25 +1177,25 @@ Method to ignore Metadata Types from the local project
 
 ### **Parameters:**
   - **types**: List of Metadata Type API Names to ignore. Undefined to ignore all metadata types
-    - Array\<String\>
+    - `Array<String>`
 
 ### **Return:**
 Return an empty promise when the ignore operation finish succesfully
-- Promise\<Any\>
+- `Promise<Any>`
 
 ### **Throws:**
 This method can throw the next exceptions:
 
-- **CLIManagerException**: If run other cli manager process when has one process running or Aura Helper CLI Return an error  
-- **DataRequiredException**: If required data is not provided
-- **OSNotSupportedException**: When run this processes with not supported operative system
-- **WrongDirectoryPathException**: If the folder path is not a String or can't convert to absolute path
-- **DirectoryNotFoundException**: If the folder path not exists or not have access to it
-- **InvalidDirectoryPathException**: If the JSON Metadata file is not a String or can't convert to absolute path
+- **`CLIManagerException`**: If run other cli manager process when has one process running or Aura Helper CLI Return an error  
+- **`DataRequiredException`**: If required data is not provided
+- **`OSNotSupportedException`**: When run this processes with not supported operative system
+- **`WrongDirectoryPathException`**: If the folder path is not a String or can't convert to absolute path
+- **`DirectoryNotFoundException`**: If the folder path not exists or not have access to it
+- **`InvalidDirectoryPathException`**: If the JSON Metadata file is not a String or can't convert to absolute path
 
 ### **Examples:**
 **Ignore all metadata types from ignore file**
-
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
@@ -1170,9 +1205,9 @@ This method can throw the next exceptions:
     }).catch((error) => {
         // Handle error
     });
-
+```
 **Ignore some metadata types from ignore file**
-
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
@@ -1190,6 +1225,7 @@ This method can throw the next exceptions:
     }).catch((error) => {
         // Handle error
     });
+```
 ---
 
 ## [**repairDependencies(types, onlyCheck, useIgnore)**](#repairdependenciestypes-onlycheck-useignore)
@@ -1199,29 +1235,29 @@ Method to repair all error dependencies from your local project. Also you can ch
 
 ### **Parameters:**
   - **types**: Metadata JSON Object or Metadata JSON file with the selected types to repair or check error dependencies. Undefined to repair or check error all metadata types
-    - String | Object
+    - `String` | `Object`
   - **onlyCheck**: True to not repair and only check the errors, false to repair errors automatically
-    - Boolean
+    - `Boolean`
    - **useIgnore**: true to use the ignore file when repair dependencies, false in otherwise
-    - Boolean
+    - `Boolean`
 
 ### **Return:**
 Return a promise with the Repair response if you check repair, or the Only Check Response when select check only option
-- Promise\<Object\>
+- `Promise<Object>`
 
 ### **Throws:**
 This method can throw the next exceptions:
 
-- **CLIManagerException**: If run other cli manager process when has one process running or Aura Helper CLI Return an error  
-- **DataRequiredException**: If required data is not provided
-- **OSNotSupportedException**: When run this processes with not supported operative system
-- **WrongDirectoryPathException**: If the folder path is not a String or can't convert to absolute path
-- **DirectoryNotFoundException**: If the folder path not exists or not have access to it
-- **InvalidDirectoryPathException**: If the JSON Metadata file is not a String or can't convert to absolute path
+- **`CLIManagerException`**: If run other cli manager process when has one process running or Aura Helper CLI Return an error  
+- **`DataRequiredException`**: If required data is not provided
+- **`OSNotSupportedException`**: When run this processes with not supported operative system
+- **`WrongDirectoryPathException`**: If the folder path is not a String or can't convert to absolute path
+- **`DirectoryNotFoundException`**: If the folder path not exists or not have access to it
+- **`InvalidDirectoryPathException`**: If the JSON Metadata file is not a String or can't convert to absolute path
 
 ### **Examples:**
 **Repair all metadata types**
-
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
@@ -1231,9 +1267,9 @@ This method can throw the next exceptions:
     }).catch((error) => {
         // Handle error
     });
-
+```
 **Repair some metadata types**
-
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
@@ -1251,9 +1287,9 @@ This method can throw the next exceptions:
     }).catch((error) => {
         // Handle error
     });
-
+```
 **Check dependencies errors**
-
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
@@ -1263,6 +1299,7 @@ This method can throw the next exceptions:
     }).catch((error) => {
         // Handle error
     });
+```
 ---
 
 ## [**isAuraHelperCLIInstalled()**](#isaurahelpercliinstalled)
@@ -1270,18 +1307,18 @@ Method to check if Aura Helper is installed on the system
 
 ### **Return:**
 Return a promise with true if is installer, false in otherwise
-- Promise\<Boolean\>
+- `Promise<Boolean>`
 
 ### **Throws:**
 This method can throw the next exceptions:
 
-- **CLIManagerException**: If run other cli manager process when has one process running or Aura Helper CLI Return an error  
-- **DataRequiredException**: If required data is not provided
-- **OSNotSupportedException**: When run this processes with not supported operative system
+- **`CLIManagerException`**: If run other cli manager process when has one process running or Aura Helper CLI Return an error  
+- **`DataRequiredException`**: If required data is not provided
+- **`OSNotSupportedException`**: When run this processes with not supported operative system
 
 ### **Examples:**
 **Check if Aura Helper is installed**
-
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
@@ -1294,6 +1331,7 @@ This method can throw the next exceptions:
     }).catch((error) => {
         // Handle error
     });
+```
 ---
 
 ## [**getAuraHelperCLIVersion()**](#getaurahelpercliversion)
@@ -1301,18 +1339,18 @@ Method to get the Aura Helper CLI installed version on the system
 
 ### **Return:**
 Return a promise with the Aura Helper CLI response
-- Promise\<Object\>
+- `Promise<Object>`
 
 ### **Throws:**
 This method can throw the next exceptions:
 
-- **CLIManagerException**: If run other cli manager process when has one process running or Aura Helper CLI Return an error  
-- **DataRequiredException**: If required data is not provided
-- **OSNotSupportedException**: When run this processes with not supported operative system
+- **`CLIManagerException`**: If run other cli manager process when has one process running or Aura Helper CLI Return an error  
+- **`DataRequiredException`**: If required data is not provided
+- **`OSNotSupportedException`**: When run this processes with not supported operative system
 
 ### **Examples:**
 **Check if Aura Helper is installed**
-
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
@@ -1322,6 +1360,7 @@ This method can throw the next exceptions:
     }).catch((error) => {
         // Handle error
     });
+```
 ---
 
 ## [**updateAuraHelperCLI()**](#updateaurahelpercli)
@@ -1329,18 +1368,18 @@ Method to update Aura Helper CLI with aura helper update command
 
 ### **Return:**
 Return a promise with the Aura Helper CLI response
-- Promise\<Object\>
+- `Promise<Object>`
 
 ### **Throws:**
 This method can throw the next exceptions:
 
-- **CLIManagerException**: If run other cli manager process when has one process running or Aura Helper CLI Return an error  
-- **DataRequiredException**: If required data is not provided
-- **OSNotSupportedException**: When run this processes with not supported operative system
+- **`CLIManagerException`**: If run other cli manager process when has one process running or Aura Helper CLI Return an error  
+- **`DataRequiredException`**: If required data is not provided
+- **`OSNotSupportedException`**: When run this processes with not supported operative system
 
 ### **Examples:**
 **Update Aura Helper CLI**
-
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
@@ -1350,6 +1389,7 @@ This method can throw the next exceptions:
     }).catch((error) => {
         // Handle error
     });
+```
 ---
 
 ## [**updateAuraHelperCLIWithNPM()**](#updateaurahelpercliwithnpm)
@@ -1357,18 +1397,18 @@ Method to update Aura Helper CLI with NPM command
 
 ### **Return:**
 Return a promise with the Aura Helper CLI response
-- Promise\<Object\>
+- `Promise<Object>`
 
 ### **Throws:**
 This method can throw the next exceptions:
 
-- **CLIManagerException**: If run other cli manager process when has one process running or Aura Helper CLI Return an error  
-- **DataRequiredException**: If required data is not provided
-- **OSNotSupportedException**: When run this processes with not supported operative system
+- **`CLIManagerException`**: If run other cli manager process when has one process running or Aura Helper CLI Return an error  
+- **`DataRequiredException`**: If required data is not provided
+- **`OSNotSupportedException`**: When run this processes with not supported operative system
 
 ### **Examples:**
 **Update Aura Helper CLI with NPM**
-
+```javascript
     const CLIManager = require('@aurahelper/cli-manager');
 
     const cliManager = new CLIManager('root/project/path', 50);
@@ -1378,11 +1418,12 @@ This method can throw the next exceptions:
     }).catch((error) => {
         // Handle error
     });
+```
 ---
 
 # [**Repair Response**](#repair-response)
 When you repair dependencies with any option (compress or not, repair specified types...) the response error has the next structure:
-
+```json
     {
         "MetadataTypeName": {
             "metadataType": "MetadataTypeName"
@@ -1417,9 +1458,10 @@ When you repair dependencies with any option (compress or not, repair specified 
             ]
         }
     }
+```
 
 Example:
-
+```json
     {
         "CustomApplication": {
             "metadataType": "CustomApplication"
@@ -1493,10 +1535,10 @@ Example:
             ]
         }
     }
-
+```
 # [**Only Check Response**](#only-check-response)
 When you only check dependencies errors the response error has the next structure:
-
+```json
     {
         "MetadataTypeName": [
             {
@@ -1529,9 +1571,9 @@ When you only check dependencies errors the response error has the next structur
             }
         ]
     }
-
+```
 Example:
-
+```json
     {
         "CustomApplication": [
             {
@@ -1576,11 +1618,11 @@ Example:
             },
         ]
     }
-
+```
 # [**Metadata JSON Format**](#metadata-file)
 
 The Metadata JSON Format used by Aura Helper Framework and modules have the next structure. Some fields are required and the datatypes checked to ensure the correct file structure. 
-
+```javascript
     {
         "MetadataAPIName": {
             "name": "MetadataAPIName",                                  // Required (String). Contains the Metadata Type API Name (like object Key)
@@ -1615,9 +1657,9 @@ The Metadata JSON Format used by Aura Helper Framework and modules have the next
             }
         }
     }
-
+```
 ### **Example**:
-
+```javascript
     {
         "CustomObject": {
             "name": "CustomObject",
@@ -1684,6 +1726,6 @@ The Metadata JSON Format used by Aura Helper Framework and modules have the next
             }
         }
     }
-
+```
 
 
