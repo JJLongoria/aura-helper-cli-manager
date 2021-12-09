@@ -185,7 +185,7 @@ export class CLIManager {
      * @throws {FileNotFoundException} If the file path not exists or not have access to it
      * @throws {InvalidFilePathException} If the file path is not a file
      */
-    compress(filesOrFolders: string | string[], sortOrder: string): Promise<void> {
+    compress(filesOrFolders: string | string[], sortOrder?: string): Promise<void> {
         startOperation(this);
         return new Promise<void>((resolve, reject) => {
             try {
