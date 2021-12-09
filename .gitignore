@@ -1,3 +1,4 @@
 /node_modules
 /coverage
-/test/assets
+/src/test/assets/*
+/dist
