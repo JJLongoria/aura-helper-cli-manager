@@ -1,15 +1,15 @@
-const EventEmitter = require('events').EventEmitter;
-const { ProcessHandler, ProcessFactory } = require('@aurahelper/core').ProcessManager;
-const { Validator, Utils, MetadataUtils, StrUtils } = require('@aurahelper/core').CoreUtils;
-const { AuraHelperCLIResponse, RetrieveResult, PackageGeneratorResult } = require('@aurahelper/core').Types;
-const { FileChecker } = require('@aurahelper/core').FileSystem;
-const MetadataFactory = require('@aurahelper/metadata-factory');
-const { CLIManagerException, OperationNotSupportedException, DataNotFoundException, WrongDatatypeException } = require('@aurahelper/core').Exceptions;
+import EventEmitter from "events";
+import { MetadataFactory } from '@aurahelper/metadata-factory';
+import { AuraHelperCLIProgress, AuraHelperCLIResponse, CLIManagerException, CoreUtils, DataNotFoundException, DependenciesCheckResponse, DependenciesRepairResponse, FileChecker, MetadataType, OperationNotSupportedException, PackageGeneratorResult, Process, ProcessFactory, ProcessHandler, RetrieveResult, WrongDatatypeException } from "@aurahelper/core";
+const Validator = CoreUtils.Validator;
+const StrUtils = CoreUtils.StrUtils;
+const Utils = CoreUtils.Utils;
+const MetadataUtils = CoreUtils.MetadataUtils;
 
 const EVENT = {
     ABORT: 'abort',
     PROGRESS: 'progress'
-}
+};
 
 /**
  * Class to create and handle Aura Helper CLI processes. 
@@ -21,15 +21,29 @@ const EVENT = {
  * 
  * All CLI Manager methods return a Promise with the associated data to the processes. 
  */
-class CLIManager {
+export class CLIManager {
+
+    projectFolder: string;
+    apiVersion?: string | number;
+    namespacePrefix: string;
+    compressFiles: boolean;
+    sortOrder?: string;
+    ignoreFile: string;
+    outputPath?: string;
+
+    _inProgress: boolean;
+    _event: EventEmitter;
+    _processes: { [key: string]: Process };
+    _abort: boolean;
+
 
     /**
      * Constructor to create a new CLI Manager object
-     * @param {String} [projectFolder] Path to the local project root folder. './' by default
-     * @param {(String | Number)} [apiVersion] API Version number to run processes and connect to salesforce
-     * @param {String} [namespacePrefix] Namespace prefix from the Org 
+     * @param {string} [projectFolder] Path to the local project root folder. './' by default
+     * @param {string | number} [apiVersion] API Version number to run processes and connect to salesforce
+     * @param {string} [namespacePrefix] Namespace prefix from the Org 
      */
-    constructor(projectFolder, apiVersion, namespacePrefix) {
+    constructor(projectFolder?: string, apiVersion?: string | number, namespacePrefix?: string) {
         this.projectFolder = (projectFolder !== undefined) ? projectFolder : './';
         this.apiVersion = apiVersion;
         this.namespacePrefix = (namespacePrefix !== undefined) ? namespacePrefix : '';
@@ -46,77 +60,77 @@ class CLIManager {
 
     /**
      * Method to set the API Version number to execute some Aura Helper CLI Processes
-     * @param {String | Number} apiVersion API Version number to run processes and connect to salesforce
+     * @param {string | number} apiVersion API Version number to run processes and connect to salesforce
      * 
      * @returns {CLIManager} Returns the cli manager object
      */
-    setApiVersion(apiVersion) {
+    setApiVersion(apiVersion: string | number): CLIManager {
         this.apiVersion = apiVersion;
         return this;
     }
 
     /**
      * Method to set the local root project path to execute all Aura Helper CLI Processes
-     * @param {String} projectFolder Path to the local project root folder. './' by default
+     * @param {string} projectFolder Path to the local project root folder. './' by default
      * 
      * @returns {CLIManager} Returns the cli manager object
      */
-    setProjectFolder(projectFolder) {
+    setProjectFolder(projectFolder: string): CLIManager {
         this.projectFolder = (projectFolder !== undefined) ? projectFolder : './';
         return this;
     }
 
     /**
      * Method to set the Namespace prefix from the project org
-     * @param {String} namespacePrefix Namespace prefix from the Org
+     * @param {string} namespacePrefix Namespace prefix from the Org
      * 
      * @returns {CLIManager} Returns the cli manager object
      */
-    setNamespacePrefix(namespacePrefix) {
+    setNamespacePrefix(namespacePrefix: string): CLIManager {
         this.namespacePrefix = (namespacePrefix !== undefined) ? namespacePrefix : '';
         return this;
     }
 
     /**
      * Method to set if compress the affected files by Aura Helper processes
-     * @param {Boolean} compressFiles True to compress all affected files by Aura Helper proceses, false in otherwise
+     * @param {boolean} compressFiles True to compress all affected files by Aura Helper proceses, false in otherwise
      * 
      * @returns {CLIManager} Returns the cli manager object
      */
-    setCompressFiles(compressFiles) {
+    setCompressFiles(compressFiles: boolean): CLIManager {
         this.compressFiles = compressFiles;
         return this;
     }
 
     /**
      * Method to set the sort order when compress XML Files
-     * @param {String} sortOrder Sort order value
+     * @param {string} sortOrder Sort order value
      * 
      * @returns {CLIManager} Returns the cli manager object
      */
-    setSortOrder(sortOrder) {
+    setSortOrder(sortOrder: string): CLIManager {
         this.sortOrder = sortOrder;
         return this;
     }
 
     /**
      * Method to set the ignore file path to use on some Aura Helper CLI Processes
-     * @param {String} ignoreFile Path to the ignore file
+     * @param {string} ignoreFile Path to the ignore file
      * 
      * @returns {CLIManager} Returns the cli manager object
      */
-    setIgnoreFile(ignoreFile) {
+    setIgnoreFile(ignoreFile: string): CLIManager {
         this.ignoreFile = ignoreFile;
         return this;
     }
 
     /**
      * Method to set the output folder path to redirect the response to files
-     * @param {String} outputPath Path to the output folder
+     * @param {string} outputPath Path to the output folder
      * 
      * @returns {CLIManager} Returns the cli manager object
      */
-    setOutputPath(outputPath) {
+    setOutputPath(outputPath: string): CLIManager {
         this.outputPath = outputPath;
         return this;
     }
@@ -127,7 +141,7 @@ class CLIManager {
      * 
      * @returns {CLIManager} Returns the cli manager object
      */
-    onProgress(callback) {
+    onProgress(callback: (progress: AuraHelperCLIProgress) => void): CLIManager {
         this._event.on(EVENT.PROGRESS, callback);
         return this;
     }
@@ -138,7 +152,7 @@ class CLIManager {
      * 
      * @returns {CLIManager} Returns the cli manager object
      */
-    onAbort(callback) {
+    onAbort(callback: () => void): CLIManager {
         this._event.on(EVENT.ABORT, callback);
         return this;
     }
@@ -146,7 +160,7 @@ class CLIManager {
     /**
      * Method to abort all CLI Manager running processes. When finishes call onAbort() callback
      */
-    abortProcess() {
+    abortProcess(): void {
         this._abort = true;
         killProcesses(this);
         this._event.emit(EVENT.ABORT);
@@ -154,8 +168,8 @@ class CLIManager {
 
     /**
      * Method to compress a single file or folder or array with files to compress (compress more than one folder is not allowed but you can compress an entire folder an subfolders)
-     * @param {String | Array<String>} filesOrFolders file path or paths to compress or folder path to compress
-     * @param {String} [sortOrder] Sort order value to sort XML Elements
+     * @param {string | string[]} filesOrFolders file path or paths to compress or folder path to compress
+     * @param {string} [sortOrder] Sort order value to sort XML Elements
      *  
      * @returns {Promise<Any>} Return an empty promise when compress files finish succesfully
      * 
@@ -171,9 +185,9 @@ class CLIManager {
      * @throws {FileNotFoundException} If the file path not exists or not have access to it
      * @throws {InvalidFilePathException} If the file path is not a file
      */
-    compress(filesOrFolders, sortOrder) {
+    compress(filesOrFolders: string | string[], sortOrder: string): Promise<void> {
         startOperation(this);
-        return new Promise((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
             try {
                 let nFiles = 0;
                 let nFolders = 0;
@@ -188,12 +202,13 @@ class CLIManager {
                         resultPaths.push(Validator.validateFolderPath(path));
                     }
                 }
-                if (nFiles == 0 && nFolders == 0)
+                if (nFiles === 0 && nFolders === 0) {
                     throw new DataNotFoundException('Not files or folders selected to compress');
-                else if (nFiles > 0 && nFolders > 0)
+                } else if (nFiles > 0 && nFolders > 0) {
                     throw new OperationNotSupportedException('Can\'t compress files and folders at the same time. Please, add only folders or files to compress');
-                else if (nFolders > 1)
+                } else if (nFolders > 1) {
                     throw new OperationNotSupportedException('Can\'t compress more than one folder at the same time.');
+                }
                 let process;
                 const projectFolder = Validator.validateFolderPath(this.projectFolder);
                 if (nFiles > 0) {
@@ -208,7 +223,7 @@ class CLIManager {
                 }
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
-                    handleResponse(response, () => {
+                    this.handleResponse(response, () => {
                         endOperation(this);
                         resolve();
                     });
@@ -226,7 +241,7 @@ class CLIManager {
     /**
      * Method to compare the local project with the project auth org. Return the Metadata Types that exists on Org and not exists on local project
      * 
-     * @returns {Promise<Object>} Return a promise with a JSON Metadata Object with the data respose. Contains the Metadata Types that exists on the project org and not in the local project.
+     * @returns {Promise<{ [key: string]: MetadataType }>} Return a promise with a JSON Metadata Object with the data respose. Contains the Metadata Types that exists on the project org and not in the local project.
      * 
      * @throws {CLIManagerException} If run other cli manager process when has one process running or Aura Helper CLI Return an error 
      * @throws {DataRequiredException} If required data is not provided
@@ -236,17 +251,17 @@ class CLIManager {
      * @throws {InvalidDirectoryPathException} If the project folder path is not a directory
      * @throws {WrongDatatypeException} If the api version is not a Number or String. Can be undefined
      */
-    compareWithOrg() {
+    compareWithOrg(): Promise<{ [key: string]: MetadataType }> {
         startOperation(this);
-        return new Promise((resolve, reject) => {
+        return new Promise<{ [key: string]: MetadataType }>((resolve, reject) => {
             try {
                 const projectFolder = Validator.validateFolderPath(this.projectFolder);
                 const process = ProcessFactory.auraHelperOrgCompare(projectFolder, { apiVersion: this.apiVersion }, (ahCliProgress) => {
                     this._event.emit(EVENT.PROGRESS, ahCliProgress);
-                })
+                });
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
-                    handleResponse(response, () => {
+                    this.handleResponse(response, () => {
                         endOperation(this);
                         resolve(MetadataFactory.deserializeMetadataTypes(response.result, true));
                     });
@@ -263,10 +278,10 @@ class CLIManager {
 
     /**
      * Method to compare between two orgs. Return the Metadata Types that exists on target and not exists on source. Source and Target must be authorized in the system.
-     * @param {String} sourceOrTarget Source org Username or Alias to compare. If does not pass target, the source will be the local project auth org and the target the parameter passed as sourceOrTarget 
-     * @param {String} [target] Target org Username or Alias to compare. (Require)
+     * @param {string} sourceOrTarget Source org Username or Alias to compare. If does not pass target, the source will be the local project auth org and the target the parameter passed as sourceOrTarget 
+     * @param {string} [target] Target org Username or Alias to compare. (Require)
      * 
-     * @returns {Promise<Object>} Return a promise with a JSON Metadata Object with the data respose. Contains the Metadata Types that exists on target and not on source.
+     * @returns {Promise<{ [key: string]: MetadataType }>} Return a promise with a JSON Metadata Object with the data respose. Contains the Metadata Types that exists on target and not on source.
      * 
      * @throws {CLIManagerException} If run other cli manager process when has one process running or Aura Helper CLI Return an error 
      * @throws {DataRequiredException} If required data is not provided
@@ -276,21 +291,22 @@ class CLIManager {
      * @throws {InvalidDirectoryPathException} If the project folder path is not a directory
      * @throws {WrongDatatypeException} If the api version is not a Number or String. Can be undefined
      */
-    compareOrgBetween(sourceOrTarget, target) {
-        if (sourceOrTarget && !target) {
+    compareOrgBetween(sourceOrTarget: string, target?: string): Promise<{ [key: string]: MetadataType }> {
+        let source: string | undefined = sourceOrTarget;
+        if (source && !target) {
             target = sourceOrTarget;
-            sourceOrTarget = undefined;
+            source = undefined;
         }
         startOperation(this);
-        return new Promise((resolve, reject) => {
+        return new Promise<{ [key: string]: MetadataType }>((resolve, reject) => {
             try {
                 const projectFolder = Validator.validateFolderPath(this.projectFolder);
-                const process = ProcessFactory.auraHelperOrgCompareBetween(projectFolder, { source: sourceOrTarget, target: target, apiVersion: this.apiVersion }, (ahCliProgress) => {
+                const process = ProcessFactory.auraHelperOrgCompareBetween(projectFolder, { source: source, target: target, apiVersion: this.apiVersion }, (ahCliProgress) => {
                     this._event.emit(EVENT.PROGRESS, ahCliProgress);
-                })
+                });
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
-                    handleResponse(response, () => {
+                    this.handleResponse(response, () => {
                         endOperation(this);
                         resolve(MetadataFactory.deserializeMetadataTypes(response.result, true));
                     });
@@ -307,10 +323,10 @@ class CLIManager {
 
     /**
      * Method to describe the all or selected Metadata Types from your local project
-     * @param {Array<String>} [types] List of Metadata Type API Names to describe. Undefined to describe all metadata types
-     * @param {Boolean} [groupGlobalActions] True to group global quick actions on "GlobalActions" group, false to include as object and item.
+     * @param {string[]} [types] List of Metadata Type API Names to describe. Undefined to describe all metadata types
+     * @param {boolean} [groupGlobalActions] True to group global quick actions on "GlobalActions" group, false to include as object and item.
      * 
-     * @returns {Promise<Object>} Return a promise with a Metadata JSON Object with the selected Metadata Types data
+     * @returns {Promise<{ [key: string]: MetadataType }>} Return a promise with a Metadata JSON Object with the selected Metadata Types data
      * 
      * @throws {CLIManagerException} If run other cli manager process when has one process running or Aura Helper CLI Return an error 
      * @throws {DataRequiredException} If required data is not provided
@@ -320,18 +336,18 @@ class CLIManager {
      * @throws {InvalidDirectoryPathException} If the project folder path is not a directory
      * @throws {WrongDatatypeException} If the api version is not a Number or String. Can be undefined
      */
-    describeLocalMetadata(types, groupGlobalActions) {
+    describeLocalMetadata(types?: string[], groupGlobalActions?: boolean): Promise<{ [key: string]: MetadataType }> {
         startOperation(this);
-        return new Promise((resolve, reject) => {
+        return new Promise<{ [key: string]: MetadataType }>((resolve, reject) => {
             try {
                 types = transformTypesToAHCLIInput(types, true);
                 const projectFolder = Validator.validateFolderPath(this.projectFolder);
                 const process = ProcessFactory.auraHelperDescribeMetadata(projectFolder, { fromOrg: false, types: types, apiVersion: this.apiVersion, groupGlobalActions: groupGlobalActions }, (ahCliProgress) => {
                     this._event.emit(EVENT.PROGRESS, ahCliProgress);
-                })
+                });
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
-                    handleResponse(response, () => {
+                    this.handleResponse(response, () => {
                         endOperation(this);
                         resolve(MetadataFactory.deserializeMetadataTypes(response.result, true));
                     });
@@ -348,11 +364,11 @@ class CLIManager {
 
     /**
      * Method to describe the all or selected Metadata Types from your project org
-     * @param {Boolean} [downloadAll] True to download all Metadata types from all namespaces, false to download only data from org namespace
-     * @param {Array<String>} [types] List of Metadata Type API Names to describe. Undefined to describe all metadata types
-     * @param {Boolean} [groupGlobalActions] True to group global quick actions on "GlobalActions" group, false to include as object and item.
+     * @param {string[]} [types] List of Metadata Type API Names to describe. Undefined to describe all metadata types
+     * @param {boolean} [downloadAll] True to download all Metadata types from all namespaces, false to download only data from org namespace
+     * @param {boolean} [groupGlobalActions] True to group global quick actions on "GlobalActions" group, false to include as object and item.
      * 
-     * @returns {Promise<Object>} Return a promise with a Metadata JSON Object with the selected Metadata Types data
+     * @returns {Promise<{ [key: string]: MetadataType }>} Return a promise with a Metadata JSON Object with the selected Metadata Types data
      * 
      * @throws {CLIManagerException} If run other cli manager process when has one process running or Aura Helper CLI Return an error 
      * @throws {DataRequiredException} If required data is not provided
@@ -362,9 +378,9 @@ class CLIManager {
      * @throws {InvalidDirectoryPathException} If the project folder path is not a directory
      * @throws {WrongDatatypeException} If the api version is not a Number or String. Can be undefined
      */
-    describeOrgMetadata(downloadAll, types, groupGlobalActions) {
+    describeOrgMetadata(types?: string[], downloadAll?: boolean, groupGlobalActions?: boolean): Promise<{ [key: string]: MetadataType }> {
         startOperation(this);
-        return new Promise((resolve, reject) => {
+        return new Promise<{ [key: string]: MetadataType }>((resolve, reject) => {
             try {
                 types = transformTypesToAHCLIInput(types, true);
                 const projectFolder = Validator.validateFolderPath(this.projectFolder);
@@ -379,7 +395,7 @@ class CLIManager {
                 });
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
-                    handleResponse(response, () => {
+                    this.handleResponse(response, () => {
                         endOperation(this);
                         resolve(MetadataFactory.deserializeMetadataTypes(response.result, true));
                     });
@@ -396,7 +412,7 @@ class CLIManager {
 
     /**
      * Method to retrieve all or selected local special types
-     * @param {(String | Object)} [types] Metadata JSON Object or Metadata JSON file with the selected types to retrieve
+     * @param {string | { [key: string]: MetadataType }} [types] Metadata JSON Object or Metadata JSON file with the selected types to retrieve
      * 
      * @returns {Promise<RetrieveResult>} Return a promise with a RetrieveResult object
      * 
@@ -412,15 +428,15 @@ class CLIManager {
      * @throws {WrongFormatException} If JSON Metadata file is not a JSON file or not have the correct Metadata JSON format
      * @throws {WrongDatatypeException} If the api version is not a Number or String. Can be undefined
      */
-    retrieveLocalSpecialMetadata(types) {
+    retrieveLocalSpecialMetadata(types?: string | { [key: string]: MetadataType }): Promise<RetrieveResult> {
         startOperation(this);
-        return new Promise((resolve, reject) => {
+        return new Promise<RetrieveResult>((resolve, reject) => {
             try {
-                types = transformTypesToAHCLIInput(types);
+                const typesToRetrieve = transformTypesToAHCLIInput(types);
                 const projectFolder = Validator.validateFolderPath(this.projectFolder);
                 const process = ProcessFactory.auraHelperRetrieveSpecial(projectFolder, {
                     fromOrg: false,
-                    types: types,
+                    types: typesToRetrieve,
                     apiVersion: this.apiVersion,
                     compress: this.compressFiles,
                     sortOrder: this.sortOrder
@@ -429,7 +445,7 @@ class CLIManager {
                 });
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
-                    handleResponse(response, () => {
+                    this.handleResponse(response, () => {
                         endOperation(this);
                         resolve(new RetrieveResult(response.result));
                     });
@@ -446,8 +462,8 @@ class CLIManager {
 
     /**
      * Method to retrieve all or selected special types from org
-     * @param {Boolean} [downloadAll] True to download all Metadata types from all namespaces, false to download only data from org namespace
-     * @param {(String | Object)} [types] Metadata JSON Object or Metadata JSON file with the selected types to retrieve
+     * @param {string | { [key: string]: MetadataType }} [types] Metadata JSON Object or Metadata JSON file with the selected types to retrieve
+     * @param {boolean} [downloadAll] True to download all Metadata types from all namespaces, false to download only data from org namespace
      * 
      * @returns {Promise<RetrieveResult>} Return a promise with a RetrieveResult object
      * 
@@ -463,15 +479,15 @@ class CLIManager {
      * @throws {WrongFormatException} If JSON Metadata file is not a JSON file or not have the correct Metadata JSON format
      * @throws {WrongDatatypeException} If the api version is not a Number or String. Can be undefined
      */
-    retrieveOrgSpecialMetadata(downloadAll, types) {
+    retrieveOrgSpecialMetadata(types?: string | { [key: string]: MetadataType }, downloadAll?: boolean): Promise<RetrieveResult> {
         startOperation(this);
-        return new Promise((resolve, reject) => {
+        return new Promise<RetrieveResult>((resolve, reject) => {
             try {
-                types = transformTypesToAHCLIInput(types);
+                const typesToRetrieve = transformTypesToAHCLIInput(types);
                 const projectFolder = Validator.validateFolderPath(this.projectFolder);
                 const process = ProcessFactory.auraHelperRetrieveSpecial(projectFolder, {
                     fromOrg: true,
-                    types: types,
+                    types: typesToRetrieve,
                     downloadAll: downloadAll,
                     apiVersion: this.apiVersion,
                     compress: this.compressFiles,
@@ -481,7 +497,7 @@ class CLIManager {
                 });
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
-                    handleResponse(response, () => {
+                    this.handleResponse(response, () => {
                         endOperation(this);
                         resolve(new RetrieveResult(response.result));
                     });
@@ -498,8 +514,8 @@ class CLIManager {
 
     /**
      * Method to retrieve all or selected special types on mixed mode
-     * @param {Boolean} [downloadAll] True to download all Metadata types from all namespaces, false to download only data from org namespace
-     * @param {(String | Object)} [types] Metadata JSON Object or Metadata JSON file with the selected types to retrieve
+     * @param {string | { [key: string]: MetadataType }} [types] Metadata JSON Object or Metadata JSON file with the selected types to retrieve
+     * @param {boolean} [downloadAll] True to download all Metadata types from all namespaces, false to download only data from org namespace
      * 
      * @returns {Promise<RetrieveResult>} Return a promise with a RetrieveResult object
      * 
@@ -515,15 +531,15 @@ class CLIManager {
      * @throws {WrongFormatException} If JSON Metadata file is not a JSON file or not have the correct Metadata JSON format
      * @throws {WrongDatatypeException} If the api version is not a Number or String. Can be undefined
      */
-    retrieveMixedSpecialMetadata(downloadAll, types) {
+    retrieveMixedSpecialMetadata(types?: string | { [key: string]: MetadataType }, downloadAll?: boolean) {
         startOperation(this);
         return new Promise((resolve, reject) => {
             try {
-                types = transformTypesToAHCLIInput(types);
+                const typesToRetrieve = transformTypesToAHCLIInput(types);
                 const projectFolder = Validator.validateFolderPath(this.projectFolder);
                 const process = ProcessFactory.auraHelperRetrieveSpecial(projectFolder, {
                     fromOrg: false,
-                    types: types,
+                    types: typesToRetrieve,
                     includeOrg: true,
                     downloadAll: downloadAll,
                     apiVersion: this.apiVersion,
@@ -534,7 +550,7 @@ class CLIManager {
                 });
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
-                    handleResponse(response, () => {
+                    this.handleResponse(response, () => {
                         endOperation(this);
                         resolve(new RetrieveResult(response.result));
                     });
@@ -552,7 +568,7 @@ class CLIManager {
     /**
      * Method to load all available user permissions on the project org
      * 
-     * @returns {Promise<Array<String>>} Return a promise with the list of available user permission API Names
+     * @returns {Promise<string[]>} Return a promise with the list of available user permission API Names
      * 
      * @throws {CLIManagerException} If run other cli manager process when has one process running or Aura Helper CLI Return an error 
      * @throws {DataRequiredException} If required data is not provided
@@ -562,9 +578,9 @@ class CLIManager {
      * @throws {InvalidDirectoryPathException} If the project folder path is not a directory
      * @throws {WrongDatatypeException} If the api version is not a Number or String. Can be undefined
      */
-    loadUserPermissions() {
+    loadUserPermissions(): Promise<string[]> {
         startOperation(this);
-        return new Promise((resolve, reject) => {
+        return new Promise<string[]>((resolve, reject) => {
             try {
                 const projectFolder = Validator.validateFolderPath(this.projectFolder);
                 const process = ProcessFactory.auraHelperLoadPermissions(projectFolder, {
@@ -574,7 +590,7 @@ class CLIManager {
                 });
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
-                    handleResponse(response, () => {
+                    this.handleResponse(response, () => {
                         endOperation(this);
                         resolve(response);
                     });
@@ -591,11 +607,11 @@ class CLIManager {
 
     /**
      * Method to create the package XML and destructive XML files from git diffs and changes between two commits, tags, branches
-     * @param {String} source Source tag, branch or commit to compare to create the package and destructive files
-     * @param {String} [target] Target tag, branch or commit to compare to create the package and destructive files
-     * @param {String} [createType] Create type option (package, destructive, both)
-     * @param {String} [deleteOrder] Delete order to create the destructive file (before or after)
-     * @param {Boolean} [useIgnore] true to use the ignore file when create the package, false in otherwise
+     * @param {string} source Source tag, branch or commit to compare to create the package and destructive files
+     * @param {string} [target] Target tag, branch or commit to compare to create the package and destructive files
+     * @param {string} [createType] Create type option (package, destructive, both)
+     * @param {string} [deleteOrder] Delete order to create the destructive file (before or after)
+     * @param {boolean} [useIgnore] true to use the ignore file when create the package, false in otherwise
      * 
      * @returns {Promise<PackageGeneratorResult>} Return a promise with the PackageGeneratorResult object with the generated file paths
      * 
@@ -607,9 +623,9 @@ class CLIManager {
      * @throws {InvalidDirectoryPathException} If the project folder path is not a directory
      * @throws {WrongDatatypeException} If the api version is not a Number or String. Can be undefined
      */
-    createPackageFromGit(source, target, createType, deleteOrder, useIgnore) {
+    createPackageFromGit(source: string, target?: string, createType?: string, deleteOrder?: string, useIgnore?: boolean): Promise<PackageGeneratorResult> {
         startOperation(this);
-        return new Promise((resolve, reject) => {
+        return new Promise<PackageGeneratorResult>((resolve, reject) => {
             try {
                 const projectFolder = Validator.validateFolderPath(this.projectFolder);
                 const process = ProcessFactory.auraHelperPackageGenerator(projectFolder, {
@@ -628,7 +644,7 @@ class CLIManager {
                 });
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
-                    handleResponse(response, () => {
+                    this.handleResponse(response, () => {
                         endOperation(this);
                         resolve(new PackageGeneratorResult(response.result));
                     });
@@ -645,11 +661,11 @@ class CLIManager {
 
     /**
      * Method to create the package XML or destructive XML file from a Metadata JSON file
-     * @param {String} source Metadata JSON file with the selected types to add to the package or destructive file
-     * @param {String} [createType] Create type value to create Package XML or Destructive XML with the JSON data (package or destructive) 
-     * @param {String} [deleteOrder] Delete order for the destructive XML file (before or after)
-     * @param {Boolean} [useIgnore] true to use the ignore file when create the package, false in otherwise
-     * @param {Boolean} [explicit] True to put all metadata type and object names explicit into the package, false to use wildcards if apply (true recommended)
+     * @param {string} source Metadata JSON file with the selected types to add to the package or destructive file
+     * @param {string} [createType] Create type value to create Package XML or Destructive XML with the JSON data (package or destructive) 
+     * @param {string} [deleteOrder] Delete order for the destructive XML file (before or after)
+     * @param {boolean} [useIgnore] true to use the ignore file when create the package, false in otherwise
+     * @param {boolean} [explicit] True to put all metadata type and object names explicit into the package, false to use wildcards if apply (true recommended)
      * 
      * @returns {Promise<PackageGeneratorResult>} Return a promise with the PackageGeneratorResult object with the generated file paths
      * 
@@ -661,9 +677,9 @@ class CLIManager {
      * @throws {InvalidDirectoryPathException} If the project folder path is not a directory
      * @throws {WrongDatatypeException} If the api version is not a Number or String. Can be undefined
      */
-    createPackageFromJSON(source, createType, deleteOrder, useIgnore, explicit) {
+    createPackageFromJSON(source: string, createType?: string, deleteOrder?: string, useIgnore?: boolean, explicit?: boolean): Promise<PackageGeneratorResult> {
         startOperation(this);
-        return new Promise((resolve, reject) => {
+        return new Promise<PackageGeneratorResult>((resolve, reject) => {
             try {
                 const projectFolder = Validator.validateFolderPath(this.projectFolder);
                 const process = ProcessFactory.auraHelperPackageGenerator(projectFolder, {
@@ -681,7 +697,7 @@ class CLIManager {
                 });
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
-                    handleResponse(response, () => {
+                    this.handleResponse(response, () => {
                         endOperation(this);
                         resolve(new PackageGeneratorResult(response.result));
                     });
@@ -698,10 +714,10 @@ class CLIManager {
 
     /**
      * Method to create the package XML or destructive XML from other Package XML Files
-     * @param {String | Array<String>} source Path or Paths to the Package XML or Destructive XML files
-     * @param {String} [createType] Create type value to create Package XML or Destructive XML with the package data (package or destructive) 
-     * @param {String} [deleteOrder] Delete order for the destructive XML file (before or after)
-     * @param {Boolean} [useIgnore] true to use the ignore file when create the package, false in otherwise
+     * @param {string | string[]} source Path or Paths to the Package XML or Destructive XML files
+     * @param {string} [createType] Create type value to create Package XML or Destructive XML with the package data (package or destructive) 
+     * @param {string} [deleteOrder] Delete order for the destructive XML file (before or after)
+     * @param {boolean} [useIgnore] true to use the ignore file when create the package, false in otherwise
      * 
      * @returns {Promise<PackageGeneratorResult>} Return a promise with the PackageGeneratorResult object with the generated file paths
      * 
@@ -713,18 +729,17 @@ class CLIManager {
      * @throws {InvalidDirectoryPathException} If the project folder path is not a directory
      * @throws {WrongDatatypeException} If the api version is not a Number or String. Can be undefined
      */
-    createPackageFromOtherPackages(source, createType, deleteOrder, useIgnore) {
+    createPackageFromOtherPackages(source: string | string[], createType?: string, deleteOrder?: string, useIgnore?: boolean): Promise<PackageGeneratorResult> {
         startOperation(this);
-        return new Promise((resolve, reject) => {
+        return new Promise<PackageGeneratorResult>((resolve, reject) => {
             try {
-                source = Utils.forceArray(source);
-                source = transformTypesToAHCLIInput(source, true);
+                const sourceRes = transformTypesToAHCLIInput(Utils.forceArray(source), true);
                 const projectFolder = Validator.validateFolderPath(this.projectFolder);
                 const process = ProcessFactory.auraHelperPackageGenerator(projectFolder, {
                     outputPath: this.outputPath,
                     createType: createType,
                     createFrom: 'package',
-                    source: source.join(','),
+                    source: (sourceRes) ? sourceRes.join(',') : undefined,
                     deleteOrder: deleteOrder,
                     useIgnore: useIgnore,
                     ignoreFile: this.ignoreFile,
@@ -735,7 +750,7 @@ class CLIManager {
                 });
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
-                    handleResponse(response, () => {
+                    this.handleResponse(response, () => {
                         endOperation(this);
                         resolve(new PackageGeneratorResult(response.result));
                     });
@@ -752,9 +767,9 @@ class CLIManager {
 
     /**
      * Method to ignore Metadata Types from the local project
-     * @param {Array<String>} [types] List of Metadata Type API Names to ignore. Undefined to ignore all metadata types
+     * @param {string[]} [types] List of Metadata Type API Names to ignore. Undefined to ignore all metadata types
      * 
-     * @returns {Promise<Any>} Return an empty promise when the ignore operation finish succesfully
+     * @returns {Promise<void>} Return an empty promise when the ignore operation finish succesfully
      * 
      * @throws {CLIManagerException} If run other cli manager process when has one process running or Aura Helper CLI Return an error 
      * @throws {DataRequiredException} If required data is not provided
@@ -763,9 +778,9 @@ class CLIManager {
      * @throws {DirectoryNotFoundException} If the project folder path not exists or not have access to it
      * @throws {InvalidDirectoryPathException} If the project folder path is not a directory
      */
-    ignoreMetadata(types) {
+    ignoreMetadata(types?: string[]): Promise<void> {
         startOperation(this);
-        return new Promise((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
             try {
                 types = transformTypesToAHCLIInput(types, true);
                 const projectFolder = Validator.validateFolderPath(this.projectFolder);
@@ -779,7 +794,7 @@ class CLIManager {
                 });
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
-                    handleResponse(response, () => {
+                    this.handleResponse(response, () => {
                         endOperation(this);
                         resolve();
                     });
@@ -796,11 +811,11 @@ class CLIManager {
 
     /**
      * Method to repair all error dependencies from your local project. Also you can check only to check if has errors.
-     * @param {(String | Object)} [types] Metadata JSON Object or Metadata JSON file with the selected types to repair or check error dependencies. Undefined to repair or check error all metadata types
-     * @param {Boolean} [onlyCheck] True to not repair and only check the errors, false to repair errors automatically
-     * @param {Boolean} [useIgnore] true to use the ignore file when repair dependencies, false in otherwise
+     * @param {string | { [key: string]: MetadataType }} [types] Metadata JSON Object or Metadata JSON file with the selected types to repair or check error dependencies. Undefined to repair or check error all metadata types
+     * @param {boolean} [onlyCheck] True to not repair and only check the errors, false to repair errors automatically
+     * @param {boolean} [useIgnore] true to use the ignore file when repair dependencies, false in otherwise
      * 
-     * @returns {Promise<Object>} Return a promise with the Repair response if you check repair, or the Only Check Response when select check only option
+     * @returns {Promise<{ [key: string]: DependenciesRepairResponse } | { [key: string]: DependenciesCheckResponse[] } | undefined>} Return a promise with the Repair response if you check repair, or the Only Check Response when select check only option
      * 
      * @throws {CLIManagerException} If run other cli manager process when has one process running or Aura Helper CLI Return an error 
      * @throws {DataRequiredException} If required data is not provided
@@ -809,14 +824,14 @@ class CLIManager {
      * @throws {DirectoryNotFoundException} If the project folder path not exists or not have access to it
      * @throws {InvalidDirectoryPathException} If the project folder path is not a directory
      */
-    repairDependencies(types, onlyCheck, useIgnore) {
+    repairDependencies(types?: string | { [key: string]: MetadataType }, onlyCheck?: boolean, useIgnore?: boolean): Promise<{ [key: string]: DependenciesRepairResponse } | { [key: string]: DependenciesCheckResponse[] } | undefined> {
         startOperation(this);
-        return new Promise((resolve, reject) => {
+        return new Promise<{ [key: string]: DependenciesRepairResponse } | { [key: string]: DependenciesCheckResponse[] } | undefined>((resolve, reject) => {
             try {
-                types = transformTypesToAHCLIInput(types);
+                const typesToRetrieve = transformTypesToAHCLIInput(types);
                 const projectFolder = Validator.validateFolderPath(this.projectFolder);
                 const process = ProcessFactory.auraHelperRepairDependencies(projectFolder, {
-                    types: types,
+                    types: typesToRetrieve,
                     useIgnore: useIgnore,
                     onlyCheck: onlyCheck,
                     ignoreFile: this.ignoreFile,
@@ -827,9 +842,34 @@ class CLIManager {
                 });
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
-                    handleResponse(response, () => {
+                    this.handleResponse(response, () => {
                         endOperation(this);
-                        resolve(response.result);
+                        if (response.result) {
+                            if (onlyCheck) {
+                                const checkResponse: { [key: string]: DependenciesCheckResponse[] } = {};
+                                for (const key of Object.keys(response.result)) {
+                                    const result: DependenciesCheckResponse[] = [];
+                                    for (const error of response.result[key]) {
+                                        result.push({
+                                            endColumn: error.endColumn,
+                                            startColumn: error.startColumn,
+                                            file: error.file,
+                                            item: error.item,
+                                            line: error.line,
+                                            message: error.message,
+                                            object: error.object,
+                                            severity: error.severity,
+                                        });
+                                    }
+                                    checkResponse[key] = result;
+                                }
+                                resolve(checkResponse);
+                            } else {
+                                resolve(response.result);
+                            }
+                        } else {
+                            resolve(undefined);
+                        }
                     });
                 }).catch((error) => {
                     endOperation(this);
@@ -845,22 +885,22 @@ class CLIManager {
     /**
      * Method to check if Aura Helper is installed on the system
      * 
-     * @returns {Promise<Boolean>} Return a promise with true if is installer, false in otherwise
+     * @returns {Promise<boolean>} Return a promise with true if is installer, false in otherwise
      * 
      * @throws {CLIManagerException} If run other cli manager process when has one process running or Aura Helper CLI Return an error 
      * @throws {DataRequiredException} If required data is not provided
      * @throws {OSNotSupportedException} When run this processes with not supported operative system
      */
-    isAuraHelperCLIInstalled() {
+    isAuraHelperCLIInstalled(): Promise<boolean> {
         startOperation(this);
-        return new Promise((resolve, reject) => {
+        return new Promise<boolean>((resolve, reject) => {
             try {
                 const process = ProcessFactory.isAuraHelperInstalled();
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then(() => {
                     endOperation(this);
-                    resolve(true)
-                }).catch((error) => {
+                    resolve(true);
+                }).catch((_error) => {
                     endOperation(this);
                     reject(false);
                 });
@@ -874,20 +914,20 @@ class CLIManager {
     /**
      * Method to get the Aura Helper CLI installed version on the system
      * 
-     * @returns {Promise<Object>} Return a promise with the Aura Helper CLI response
+     * @returns {Promise<string>} Return a promise with the Aura Helper CLI response
      * 
      * @throws {CLIManagerException} If run other cli manager process when has one process running or Aura Helper CLI Return an error 
      * @throws {DataRequiredException} If required data is not provided
      * @throws {OSNotSupportedException} When run this processes with not supported operative system
      */
-    getAuraHelperCLIVersion() {
+    getAuraHelperCLIVersion(): Promise<string> {
         startOperation(this);
-        return new Promise((resolve, reject) => {
+        return new Promise<string>((resolve, reject) => {
             try {
                 const process = ProcessFactory.auraHelperVersion();
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
-                    handleResponse(response, () => {
+                    this.handleResponse(response, () => {
                         endOperation(this);
                         resolve(StrUtils.replace(response, 'Aura Helper CLI Version: v', ''));
                     });
@@ -905,15 +945,15 @@ class CLIManager {
     /**
      * Method to update Aura Helper CLI with aura helper update command
      * 
-     * @returns {Promise<Object>} Return a promise with the Aura Helper CLI response
+     * @returns {Promise<any>} Return a promise with the Aura Helper CLI response
      * 
      * @throws {CLIManagerException} If run other cli manager process when has one process running or Aura Helper CLI Return an error 
      * @throws {DataRequiredException} If required data is not provided
      * @throws {OSNotSupportedException} When run this processes with not supported operative system
      */
-    updateAuraHelperCLI() {
+    updateAuraHelperCLI(): Promise<any> {
         startOperation(this);
-        return new Promise((resolve, reject) => {
+        return new Promise<any>((resolve, reject) => {
             try {
                 const process = ProcessFactory.auraHelperUpdate();
                 addProcess(this, process);
@@ -934,7 +974,7 @@ class CLIManager {
     /**
      * Method to update Aura Helper CLI with NPM command
      * 
-     * @returns {Promise<Object>} Return a promise with the Aura Helper CLI response
+     * @returns {Promise<any>} Return a promise with the Aura Helper CLI response
      * 
      * @throws {CLIManagerException} If run other cli manager process when has one process running or Aura Helper CLI Return an error 
      * @throws {DataRequiredException} If required data is not provided
@@ -943,7 +983,7 @@ class CLIManager {
      * @throws {DirectoryNotFoundException} If the project folder path not exists or not have access to it
      * @throws {InvalidDirectoryPathException} If the project folder path is not a directory
      */
-    updateAuraHelperCLIWithNPM() {
+    updateAuraHelperCLIWithNPM(): Promise<any> {
         startOperation(this);
         return new Promise((resolve, reject) => {
             try {
@@ -962,26 +1002,49 @@ class CLIManager {
             }
         });
     }
-}
-module.exports = CLIManager;
 
-function transformTypesToAHCLIInput(types, onlyTypes) {
+    handleResponse(response: any, onSuccess: () => void) {
+        if (response !== undefined) {
+            if (Utils.isObject(response)) {
+                if (response.status === 0) {
+                    onSuccess.call(this);
+                } else {
+                    if (response.message) {
+                        throw new CLIManagerException(response.message);
+                    } else {
+                        throw new CLIManagerException(response);
+                    }
+                }
+            } else {
+                onSuccess.call(this);
+            }
+        } else {
+            response = new AuraHelperCLIResponse(0, '', {});
+            onSuccess.call(this);
+        }
+    }
+}
+
+function transformTypesToAHCLIInput(types?: string | string[] | { [key: string]: MetadataType }, onlyTypes?: boolean): string[] | undefined {
     const result = [];
-    if (!types)
+    if (!types) {
         return undefined;
-    if (Utils.isArray(types)) {
+    }
+    if (Array.isArray(types)) {
         for (const type of types) {
-            if (!Utils.isString(type))
+            if (!Utils.isString(type)) {
                 throw new WrongDatatypeException('The types list must contains Strings only');
+            }
             result.push(type);
         }
     } else {
-        types = Validator.validateMetadataJSON(types);
-        for (const metadataTypeName of Object.keys(types)) {
-            const metadataType = types[metadataTypeName];
+        const metadataTypes = Validator.validateMetadataJSON(types);
+        for (const metadataTypeName of Object.keys(metadataTypes)) {
+            const metadataType = metadataTypes[metadataTypeName];
             if (onlyTypes) {
-                if (metadataType.checked)
+                if (metadataType.checked) {
                     result.push(metadataTypeName);
+                }
             } else {
                 if (metadataType.checked) {
                     result.push(metadataTypeName);
@@ -1006,31 +1069,7 @@ function transformTypesToAHCLIInput(types, onlyTypes) {
     return result;
 }
 
-function getCallback(args, cliManager) {
-    return Utils.getCallbackFunction(args) || cliManager._progressCallback;
-}
-
-function handleResponse(response, onSuccess) {
-    if (response !== undefined) {
-        if (Utils.isObject(response)) {
-            if (response.status === 0) {
-                onSuccess.call(this);
-            } else {
-                if (response.message)
-                    throw new CLIManagerException(response.message);
-                else
-                    throw new CLIManagerException(response);
-            }
-        } else {
-            onSuccess.call(this);
-        }
-    } else {
-        response = new AuraHelperCLIResponse(0, '', {});
-        onSuccess.call(this);
-    }
-}
-
-function killProcesses(cliManager) {
+function killProcesses(cliManager: CLIManager): void {
     if (cliManager._processes && Object.keys(cliManager._processes).length > 0) {
         for (let process of Object.keys(cliManager._processes)) {
             killProcess(cliManager, cliManager._processes[process]);
@@ -1038,26 +1077,22 @@ function killProcesses(cliManager) {
     }
 }
 
-function killProcess(cliManager, process) {
+function killProcess(cliManager: CLIManager, process: Process) {
     process.kill();
     delete cliManager._processes[process.name];
 }
 
-function startOperation(cliManager) {
-    if (!cliManager.allowConcurrence) {
-        if (cliManager._inProgress)
-            throw new CLIManagerException('Connection in use. Abort the current operation to execute other.');
-        cliManager._abort = false;
-        cliManager._inProgress = true;
-        cliManager._processes = {};
-    }
+function startOperation(cliManager: CLIManager) {
+    cliManager._abort = false;
+    cliManager._inProgress = true;
+    cliManager._processes = {};
 }
 
-function endOperation(cliManager) {
+function endOperation(cliManager: CLIManager) {
     cliManager._inProgress = false;
     cliManager._processes = {};
 }
 
-function addProcess(cliManager, process) {
+function addProcess(cliManager: CLIManager, process: Process) {
     cliManager._processes[process.name] = process;
 }
