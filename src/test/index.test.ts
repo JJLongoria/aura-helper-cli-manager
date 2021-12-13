@@ -31,7 +31,7 @@ describe('Testing ./index.js', () => {
             cliManager.setProjectFolder('./src/test/assets/SFDXProjects');
             response = await cliManager.compareWithOrg();
         } catch (error) {
-
+           
         }
         
     }, 300000);
