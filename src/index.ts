@@ -29,12 +29,14 @@ export class CLIManager {
     compressFiles: boolean;
     sortOrder?: string;
     ignoreFile: string;
+    destructiveIgnoreFile?: string;
     outputPath?: string;
 
     _inProgress: boolean;
     _event: EventEmitter;
     _processes: { [key: string]: Process };
     _abort: boolean;
+    _useAuraHelperSFDX: boolean;
 
 
     /**
@@ -56,6 +58,18 @@ export class CLIManager {
         this._event = new EventEmitter();
         this._processes = {};
         this._abort = false;
+        this._useAuraHelperSFDX = false;
+    }
+
+    /**
+     * Method to use Aura Helper SFDX Plugin instead Aura Helper CLI
+     * @param {boolean} useAuraHelperSFDX True to use Aura Helper SFDX Plugin
+     * 
+     * @returns {CLIManager} Returns the cli manager object
+     */
+    useAuraHelperSFDX(useAuraHelperSFDX?: boolean): CLIManager {
+        this._useAuraHelperSFDX = (useAuraHelperSFDX !== undefined) ? useAuraHelperSFDX : true;
+        return this;
     }
 
     /**
@@ -125,6 +139,17 @@ export class CLIManager {
     }
 
     /**
+     * Method to set the destructive ignore file path to use on some Aura Helper CLI Processes
+     * @param {string} destructiveIgnoreFile Path to the ignore file
+     * 
+     * @returns {CLIManager} Returns the cli manager object
+     */
+    setDestructiveIgnoreFile(destructiveIgnoreFile: string): CLIManager {
+        this.destructiveIgnoreFile = destructiveIgnoreFile;
+        return this;
+    }
+
+    /**
      * Method to set the output folder path to redirect the response to files
      * @param {string} outputPath Path to the output folder
      * 
@@ -189,37 +214,50 @@ export class CLIManager {
         startOperation(this);
         return new Promise<void>((resolve, reject) => {
             try {
+                let projectFolder = Validator.validateFolderPath(this.projectFolder);
+                if (!projectFolder.endsWith('/') && !projectFolder.endsWith('\\')) {
+                    projectFolder += '/';
+                }
                 let nFiles = 0;
                 let nFolders = 0;
                 const paths = Utils.forceArray(filesOrFolders);
-                const resultPaths = [];
-                for (const path of paths) {
-                    if (FileChecker.isFile(path)) {
-                        nFiles++;
-                        resultPaths.push(Validator.validateFilePath(path));
-                    } else {
+                const resultPaths: string[] = [];
+                for (let path of paths) {
+                    path = path.trim();
+                    path = path.startsWith('./') && path !== projectFolder ? projectFolder + path.substring(2) : path;
+                    if (FileChecker.isDirectory(path)) {
                         nFolders++;
-                        resultPaths.push(Validator.validateFolderPath(path));
+                        resultPaths.push(path);
+                    } else if (FileChecker.isFile(path)) {
+                        nFiles++;
+                        resultPaths.push(path);
                     }
                 }
                 if (nFiles === 0 && nFolders === 0) {
-                    throw new DataNotFoundException('Not files or folders selected to compress');
+                    throw new DataNotFoundException('Not files or folders selected to compress, or not exists: ' + resultPaths.join(','));
                 } else if (nFiles > 0 && nFolders > 0) {
                     throw new OperationNotSupportedException('Can\'t compress files and folders at the same time. Please, add only folders or files to compress');
                 } else if (nFolders > 1) {
                     throw new OperationNotSupportedException('Can\'t compress more than one folder at the same time.');
                 }
                 let process;
-                const projectFolder = Validator.validateFolderPath(this.projectFolder);
                 if (nFiles > 0) {
-                    process = ProcessFactory.auraHelperCompressFile(projectFolder, { file: resultPaths, sortOrder: sortOrder }, (ahCliProgress) => {
-                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
-                    });
+                    if (this._useAuraHelperSFDX) {
+                        process = ProcessFactory.auraHelperSFDXCompressFile(projectFolder, { file: resultPaths, sortOrder: sortOrder });
+                    } else {
+                        process = ProcessFactory.auraHelperCompressFile(projectFolder, { file: resultPaths, sortOrder: sortOrder }, (ahCliProgress) => {
+                            this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                        });
+                    }
                 }
                 else {
-                    process = ProcessFactory.auraHelperCompressFolder(projectFolder, { folder: resultPaths, sortOrder: sortOrder }, (ahCliProgress) => {
-                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
-                    });
+                    if (this._useAuraHelperSFDX) {
+                        process = ProcessFactory.auraHelperSFDXCompressFolder(projectFolder, { folder: resultPaths, sortOrder: sortOrder });
+                    } else {
+                        process = ProcessFactory.auraHelperCompressFolder(projectFolder, { folder: resultPaths, sortOrder: sortOrder }, (ahCliProgress) => {
+                            this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                        });
+                    }
                 }
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
@@ -256,9 +294,14 @@ export class CLIManager {
         return new Promise<{ [key: string]: MetadataType }>((resolve, reject) => {
             try {
                 const projectFolder = Validator.validateFolderPath(this.projectFolder);
-                const process = ProcessFactory.auraHelperOrgCompare(projectFolder, { apiVersion: this.apiVersion }, (ahCliProgress) => {
-                    this._event.emit(EVENT.PROGRESS, ahCliProgress);
-                });
+                let process;
+                if (this._useAuraHelperSFDX) {
+                    process = ProcessFactory.auraHelperSFDXOrgCompare(projectFolder, { apiVersion: this.apiVersion });
+                } else {
+                    process = ProcessFactory.auraHelperOrgCompare(projectFolder, { apiVersion: this.apiVersion }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                    });
+                }
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
                     this.handleResponse(response, () => {
@@ -301,9 +344,14 @@ export class CLIManager {
         return new Promise<{ [key: string]: MetadataType }>((resolve, reject) => {
             try {
                 const projectFolder = Validator.validateFolderPath(this.projectFolder);
-                const process = ProcessFactory.auraHelperOrgCompareBetween(projectFolder, { source: source, target: target, apiVersion: this.apiVersion }, (ahCliProgress) => {
-                    this._event.emit(EVENT.PROGRESS, ahCliProgress);
-                });
+                let process;
+                if (this._useAuraHelperSFDX) {
+                    process = ProcessFactory.auraHelperSFDXOrgCompareBetween(projectFolder, { source: source, target: target as string, apiVersion: this.apiVersion });
+                } else {
+                    process = ProcessFactory.auraHelperOrgCompareBetween(projectFolder, { source: source, target: target as string, apiVersion: this.apiVersion }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                    });
+                }
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
                     this.handleResponse(response, () => {
@@ -342,9 +390,14 @@ export class CLIManager {
             try {
                 types = transformTypesToAHCLIInput(types, true);
                 const projectFolder = Validator.validateFolderPath(this.projectFolder);
-                const process = ProcessFactory.auraHelperDescribeMetadata(projectFolder, { fromOrg: false, types: types, apiVersion: this.apiVersion, groupGlobalActions: groupGlobalActions }, (ahCliProgress) => {
-                    this._event.emit(EVENT.PROGRESS, ahCliProgress);
-                });
+                let process;
+                if (this._useAuraHelperSFDX) {
+                    process = ProcessFactory.auraHelperSFDXDescribeMetadata(projectFolder, { fromOrg: false, types: types, apiVersion: this.apiVersion, groupGlobalActions: groupGlobalActions });
+                } else {
+                    process = ProcessFactory.auraHelperDescribeMetadata(projectFolder, { fromOrg: false, types: types, apiVersion: this.apiVersion, groupGlobalActions: groupGlobalActions }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                    });
+                }
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
                     this.handleResponse(response, () => {
@@ -384,15 +437,26 @@ export class CLIManager {
             try {
                 types = transformTypesToAHCLIInput(types, true);
                 const projectFolder = Validator.validateFolderPath(this.projectFolder);
-                const process = ProcessFactory.auraHelperDescribeMetadata(projectFolder, {
-                    fromOrg: true,
-                    downloadAll: downloadAll,
-                    types: types,
-                    apiVersion: this.apiVersion,
-                    groupGlobalActions: groupGlobalActions
-                }, (ahCliProgress) => {
-                    this._event.emit(EVENT.PROGRESS, ahCliProgress);
-                });
+                let process;
+                if (this._useAuraHelperSFDX) {
+                    process = ProcessFactory.auraHelperSFDXDescribeMetadata(projectFolder, {
+                        fromOrg: true,
+                        downloadAll: downloadAll,
+                        types: types,
+                        apiVersion: this.apiVersion,
+                        groupGlobalActions: groupGlobalActions
+                    });
+                } else {
+                    process = ProcessFactory.auraHelperDescribeMetadata(projectFolder, {
+                        fromOrg: true,
+                        downloadAll: downloadAll,
+                        types: types,
+                        apiVersion: this.apiVersion,
+                        groupGlobalActions: groupGlobalActions
+                    }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                    });
+                }
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
                     this.handleResponse(response, () => {
@@ -434,15 +498,26 @@ export class CLIManager {
             try {
                 const typesToRetrieve = transformTypesToAHCLIInput(types);
                 const projectFolder = Validator.validateFolderPath(this.projectFolder);
-                const process = ProcessFactory.auraHelperRetrieveSpecial(projectFolder, {
-                    fromOrg: false,
-                    types: typesToRetrieve,
-                    apiVersion: this.apiVersion,
-                    compress: this.compressFiles,
-                    sortOrder: this.sortOrder
-                }, (ahCliProgress) => {
-                    this._event.emit(EVENT.PROGRESS, ahCliProgress);
-                });
+                let process;
+                if (this._useAuraHelperSFDX) {
+                    process = ProcessFactory.auraHelperSFDXRetrieveSpecial(projectFolder, {
+                        fromOrg: false,
+                        types: typesToRetrieve,
+                        apiVersion: this.apiVersion,
+                        compress: this.compressFiles,
+                        sortOrder: this.sortOrder
+                    });
+                } else {
+                    process = ProcessFactory.auraHelperRetrieveSpecial(projectFolder, {
+                        fromOrg: false,
+                        types: typesToRetrieve,
+                        apiVersion: this.apiVersion,
+                        compress: this.compressFiles,
+                        sortOrder: this.sortOrder
+                    }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                    });
+                }
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
                     this.handleResponse(response, () => {
@@ -485,16 +560,28 @@ export class CLIManager {
             try {
                 const typesToRetrieve = transformTypesToAHCLIInput(types);
                 const projectFolder = Validator.validateFolderPath(this.projectFolder);
-                const process = ProcessFactory.auraHelperRetrieveSpecial(projectFolder, {
-                    fromOrg: true,
-                    types: typesToRetrieve,
-                    downloadAll: downloadAll,
-                    apiVersion: this.apiVersion,
-                    compress: this.compressFiles,
-                    sortOrder: this.sortOrder
-                }, (ahCliProgress) => {
-                    this._event.emit(EVENT.PROGRESS, ahCliProgress);
-                });
+                let process;
+                if (this._useAuraHelperSFDX) {
+                    process = ProcessFactory.auraHelperSFDXRetrieveSpecial(projectFolder, {
+                        fromOrg: true,
+                        types: typesToRetrieve,
+                        downloadAll: downloadAll,
+                        apiVersion: this.apiVersion,
+                        compress: this.compressFiles,
+                        sortOrder: this.sortOrder
+                    });
+                } else {
+                    process = ProcessFactory.auraHelperRetrieveSpecial(projectFolder, {
+                        fromOrg: true,
+                        types: typesToRetrieve,
+                        downloadAll: downloadAll,
+                        apiVersion: this.apiVersion,
+                        compress: this.compressFiles,
+                        sortOrder: this.sortOrder
+                    }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                    });
+                }
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
                     this.handleResponse(response, () => {
@@ -537,17 +624,30 @@ export class CLIManager {
             try {
                 const typesToRetrieve = transformTypesToAHCLIInput(types);
                 const projectFolder = Validator.validateFolderPath(this.projectFolder);
-                const process = ProcessFactory.auraHelperRetrieveSpecial(projectFolder, {
-                    fromOrg: false,
-                    types: typesToRetrieve,
-                    includeOrg: true,
-                    downloadAll: downloadAll,
-                    apiVersion: this.apiVersion,
-                    compress: this.compressFiles,
-                    sortOrder: this.sortOrder
-                }, (ahCliProgress) => {
-                    this._event.emit(EVENT.PROGRESS, ahCliProgress);
-                });
+                let process;
+                if (this._useAuraHelperSFDX) {
+                    process = ProcessFactory.auraHelperSFDXRetrieveSpecial(projectFolder, {
+                        fromOrg: false,
+                        types: typesToRetrieve,
+                        includeOrg: true,
+                        downloadAll: downloadAll,
+                        apiVersion: this.apiVersion,
+                        compress: this.compressFiles,
+                        sortOrder: this.sortOrder
+                    });
+                } else {
+                    process = ProcessFactory.auraHelperRetrieveSpecial(projectFolder, {
+                        fromOrg: false,
+                        types: typesToRetrieve,
+                        includeOrg: true,
+                        downloadAll: downloadAll,
+                        apiVersion: this.apiVersion,
+                        compress: this.compressFiles,
+                        sortOrder: this.sortOrder
+                    }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                    });
+                }
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
                     this.handleResponse(response, () => {
@@ -583,11 +683,18 @@ export class CLIManager {
         return new Promise<string[]>((resolve, reject) => {
             try {
                 const projectFolder = Validator.validateFolderPath(this.projectFolder);
-                const process = ProcessFactory.auraHelperLoadPermissions(projectFolder, {
-                    apiVersion: this.apiVersion,
-                }, (ahCliProgress) => {
-                    this._event.emit(EVENT.PROGRESS, ahCliProgress);
-                });
+                let process;
+                if (this._useAuraHelperSFDX) {
+                    process = ProcessFactory.auraHelperSFDXLoadPermissions(projectFolder, {
+                        apiVersion: this.apiVersion,
+                    });
+                } else {
+                    process = ProcessFactory.auraHelperLoadPermissions(projectFolder, {
+                        apiVersion: this.apiVersion,
+                    }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                    });
+                }
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
                     this.handleResponse(response, () => {
@@ -612,6 +719,7 @@ export class CLIManager {
      * @param {string} [createType] Create type option (package, destructive, both)
      * @param {string} [deleteOrder] Delete order to create the destructive file (before or after)
      * @param {boolean} [useIgnore] true to use the ignore file when create the package, false in otherwise
+     * @param {boolean} [ignoreDestructive] true to use the destructive ignore file when create the package to ignore metadata from destructive changes, false in otherwise
      * 
      * @returns {Promise<PackageGeneratorResult>} Return a promise with the PackageGeneratorResult object with the generated file paths
      * 
@@ -623,25 +731,41 @@ export class CLIManager {
      * @throws {InvalidDirectoryPathException} If the project folder path is not a directory
      * @throws {WrongDatatypeException} If the api version is not a Number or String. Can be undefined
      */
-    createPackageFromGit(source: string, target?: string, createType?: string, deleteOrder?: string, useIgnore?: boolean): Promise<PackageGeneratorResult> {
+    createPackageFromGit(source: string, target?: string, createType?: string, deleteOrder?: string, useIgnore?: boolean, ignoreDestructive?: boolean): Promise<PackageGeneratorResult> {
         startOperation(this);
         return new Promise<PackageGeneratorResult>((resolve, reject) => {
             try {
                 const projectFolder = Validator.validateFolderPath(this.projectFolder);
-                const process = ProcessFactory.auraHelperPackageGenerator(projectFolder, {
-                    outputPath: this.outputPath,
-                    createType: createType,
-                    createFrom: 'git',
-                    source: source,
-                    target: target,
-                    deleteOrder: deleteOrder,
-                    useIgnore: useIgnore,
-                    ignoreFile: this.ignoreFile,
-                    apiVersion: this.apiVersion,
-                    explicit: true,
-                }, (ahCliProgress) => {
-                    this._event.emit(EVENT.PROGRESS, ahCliProgress);
-                });
+                let process;
+                if (this._useAuraHelperSFDX) {
+                    process = ProcessFactory.auraHelperSFDXGitPackage(projectFolder, {
+                        outputPath: this.outputPath,
+                        fileType: createType,
+                        source: source,
+                        target: target,
+                        useIgnore: useIgnore,
+                        ignoreFile: this.ignoreFile,
+                        apiVersion: this.apiVersion,
+                        deleteBefore: deleteOrder === 'before',
+                        destructiveIgnoreFile: this.destructiveIgnoreFile,
+                        ignoreDestructive: ignoreDestructive,
+                    });
+                } else {
+                    process = ProcessFactory.auraHelperPackageGenerator(projectFolder, {
+                        outputPath: this.outputPath,
+                        createType: createType,
+                        createFrom: 'git',
+                        source: target || source,
+                        target: source,
+                        deleteOrder: deleteOrder,
+                        useIgnore: useIgnore,
+                        ignoreFile: this.ignoreFile,
+                        apiVersion: this.apiVersion,
+                        explicit: true,
+                    }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                    });
+                }
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
                     this.handleResponse(response, () => {
@@ -682,19 +806,33 @@ export class CLIManager {
         return new Promise<PackageGeneratorResult>((resolve, reject) => {
             try {
                 const projectFolder = Validator.validateFolderPath(this.projectFolder);
-                const process = ProcessFactory.auraHelperPackageGenerator(projectFolder, {
-                    outputPath: this.outputPath,
-                    createType: createType,
-                    createFrom: 'json',
-                    source: source,
-                    deleteOrder: deleteOrder,
-                    useIgnore: useIgnore,
-                    ignoreFile: this.ignoreFile,
-                    apiVersion: this.apiVersion,
-                    explicit: explicit,
-                }, (ahCliProgress) => {
-                    this._event.emit(EVENT.PROGRESS, ahCliProgress);
-                });
+                let process;
+                if (this._useAuraHelperSFDX) {
+                    process = ProcessFactory.auraHelperSFDXJSONPackage(projectFolder, {
+                        outputPath: this.outputPath,
+                        source: source,
+                        deleteBefore: deleteOrder === 'before',
+                        useIgnore: useIgnore,
+                        ignoreFile: this.ignoreFile,
+                        apiVersion: this.apiVersion,
+                        wilcards: !explicit,
+                        toDelete: createType === 'destructive'
+                    });
+                } else {
+                    process = ProcessFactory.auraHelperPackageGenerator(projectFolder, {
+                        outputPath: this.outputPath,
+                        createType: createType,
+                        createFrom: 'json',
+                        source: source,
+                        deleteOrder: deleteOrder,
+                        useIgnore: useIgnore,
+                        ignoreFile: this.ignoreFile,
+                        apiVersion: this.apiVersion,
+                        explicit: explicit,
+                    }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                    });
+                }
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
                     this.handleResponse(response, () => {
@@ -729,25 +867,40 @@ export class CLIManager {
      * @throws {InvalidDirectoryPathException} If the project folder path is not a directory
      * @throws {WrongDatatypeException} If the api version is not a Number or String. Can be undefined
      */
-    createPackageFromOtherPackages(source: string | string[], createType?: string, deleteOrder?: string, useIgnore?: boolean): Promise<PackageGeneratorResult> {
+    createPackageFromOtherPackages(source: string | string[], createType?: string, deleteOrder?: string, useIgnore?: boolean, ignoreDestructive?: boolean): Promise<PackageGeneratorResult> {
         startOperation(this);
         return new Promise<PackageGeneratorResult>((resolve, reject) => {
             try {
                 const sourceRes = transformTypesToAHCLIInput(Utils.forceArray(source), true);
                 const projectFolder = Validator.validateFolderPath(this.projectFolder);
-                const process = ProcessFactory.auraHelperPackageGenerator(projectFolder, {
-                    outputPath: this.outputPath,
-                    createType: createType,
-                    createFrom: 'package',
-                    source: (sourceRes) ? sourceRes.join(',') : undefined,
-                    deleteOrder: deleteOrder,
-                    useIgnore: useIgnore,
-                    ignoreFile: this.ignoreFile,
-                    apiVersion: this.apiVersion,
-                    explicit: true,
-                }, (ahCliProgress) => {
-                    this._event.emit(EVENT.PROGRESS, ahCliProgress);
-                });
+                let process;
+                if (this._useAuraHelperSFDX) {
+                    process = ProcessFactory.auraHelperSFDXMergePackage(projectFolder, {
+                        outputPath: this.outputPath,
+                        source: (sourceRes) ? sourceRes.join(',') : '',
+                        useIgnore: useIgnore,
+                        ignoreFile: this.ignoreFile,
+                        apiVersion: this.apiVersion,
+                        bytype: true,
+                        deleteBefore: deleteOrder === 'before',
+                        ignoreDestructive: ignoreDestructive,
+                        destructiveIgnoreFile: this.destructiveIgnoreFile,
+                    });
+                } else {
+                    process = ProcessFactory.auraHelperPackageGenerator(projectFolder, {
+                        outputPath: this.outputPath,
+                        createType: createType,
+                        createFrom: 'package',
+                        source: (sourceRes) ? sourceRes.join(',') : '',
+                        deleteOrder: deleteOrder,
+                        useIgnore: useIgnore,
+                        ignoreFile: this.ignoreFile,
+                        apiVersion: this.apiVersion,
+                        explicit: true,
+                    }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                    });
+                }
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
                     this.handleResponse(response, () => {
@@ -784,14 +937,24 @@ export class CLIManager {
             try {
                 types = transformTypesToAHCLIInput(types, true);
                 const projectFolder = Validator.validateFolderPath(this.projectFolder);
-                const process = ProcessFactory.auraHelperIgnore(projectFolder, {
-                    types: types,
-                    ignoreFile: this.ignoreFile,
-                    compress: this.compressFiles,
-                    sortOrder: this.sortOrder
-                }, (ahCliProgress) => {
-                    this._event.emit(EVENT.PROGRESS, ahCliProgress);
-                });
+                let process;
+                if (this._useAuraHelperSFDX) {
+                    process = ProcessFactory.auraHelperSFDXIgnore(projectFolder, {
+                        types: types,
+                        ignoreFile: this.ignoreFile,
+                        compress: this.compressFiles,
+                        sortOrder: this.sortOrder
+                    });
+                } else {
+                    process = ProcessFactory.auraHelperIgnore(projectFolder, {
+                        types: types,
+                        ignoreFile: this.ignoreFile,
+                        compress: this.compressFiles,
+                        sortOrder: this.sortOrder
+                    }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                    });
+                }
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
                     this.handleResponse(response, () => {
@@ -830,16 +993,29 @@ export class CLIManager {
             try {
                 const typesToRetrieve = transformTypesToAHCLIInput(types);
                 const projectFolder = Validator.validateFolderPath(this.projectFolder);
-                const process = ProcessFactory.auraHelperRepairDependencies(projectFolder, {
-                    types: typesToRetrieve,
-                    useIgnore: useIgnore,
-                    onlyCheck: onlyCheck,
-                    ignoreFile: this.ignoreFile,
-                    compress: this.compressFiles,
-                    sortOrder: this.sortOrder
-                }, (ahCliProgress) => {
-                    this._event.emit(EVENT.PROGRESS, ahCliProgress);
-                });
+                let process;
+                if (this._useAuraHelperSFDX) {
+                    process = ProcessFactory.auraHelperSFDXRepairDependencies(projectFolder, {
+                        types: typesToRetrieve,
+                        useIgnore: useIgnore,
+                        onlyCheck: onlyCheck,
+                        ignoreFile: this.ignoreFile,
+                        compress: this.compressFiles,
+                        sortOrder: this.sortOrder,
+                        apiVersion: this.apiVersion,
+                    });
+                } else {
+                    process = ProcessFactory.auraHelperRepairDependencies(projectFolder, {
+                        types: typesToRetrieve,
+                        useIgnore: useIgnore,
+                        onlyCheck: onlyCheck,
+                        ignoreFile: this.ignoreFile,
+                        compress: this.compressFiles,
+                        sortOrder: this.sortOrder
+                    }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                    });
+                }
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
                     this.handleResponse(response, () => {
@@ -895,11 +1071,27 @@ export class CLIManager {
         startOperation(this);
         return new Promise<boolean>((resolve, reject) => {
             try {
-                const process = ProcessFactory.isAuraHelperInstalled();
+                let process;
+                if (this._useAuraHelperSFDX) {
+                    process = ProcessFactory.getSFDXPlugins();
+                } else {
+                    process = ProcessFactory.isAuraHelperInstalled();
+                }
                 addProcess(this, process);
-                ProcessHandler.runProcess(process).then(() => {
+                ProcessHandler.runProcess(process).then((response) => {
                     endOperation(this);
-                    resolve(true);
+                    if (this._useAuraHelperSFDX) {
+                        this.handleResponse(response, () => {
+                            endOperation(this);
+                            if (response && StrUtils.contains(response, 'aura-helper-sfdx')) {
+                                resolve(true);
+                            } else {
+                                resolve(false);
+                            }
+                        });
+                    } else {
+                        resolve(true);
+                    }
                 }).catch((_error) => {
                     endOperation(this);
                     reject(false);
@@ -924,12 +1116,21 @@ export class CLIManager {
         startOperation(this);
         return new Promise<string>((resolve, reject) => {
             try {
-                const process = ProcessFactory.auraHelperVersion();
+                let process;
+                if (this._useAuraHelperSFDX) {
+                    process = ProcessFactory.auraHelperSFDXVersion();
+                } else {
+                    process = ProcessFactory.auraHelperVersion();
+                }
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
                     this.handleResponse(response, () => {
                         endOperation(this);
-                        resolve(StrUtils.replace(response, 'Aura Helper CLI Version: v', ''));
+                        if (this._useAuraHelperSFDX) {
+                            resolve(response.result.version);
+                        } else {
+                            resolve(StrUtils.replace(response, 'Aura Helper CLI Version: v', ''));
+                        }
                     });
                 }).catch((error) => {
                     endOperation(this);
@@ -955,7 +1156,12 @@ export class CLIManager {
         startOperation(this);
         return new Promise<any>((resolve, reject) => {
             try {
-                const process = ProcessFactory.auraHelperUpdate();
+                let process;
+                if (this._useAuraHelperSFDX) {
+                    process = ProcessFactory.auraHelperSFDXUpdate();
+                } else {
+                    process = ProcessFactory.auraHelperUpdate();
+                }
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
                     endOperation(this);
