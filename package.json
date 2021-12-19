@@ -2,8 +2,8 @@
   "name": "@aurahelper/cli-manager",
   "productName": "Aura Helper CLI Manager",
   "displayName": "Aura Helper Framework CLI Manager",
-  "version": "2.0.0",
-  "description": "Module to handle Aura Helper CLI processes used in Aura Helper VSCode Extension",
+  "version": "2.1.0",
+  "description": "Module to handle Aura Helper CLI and Aura Helper SFDX processes used in Aura Helper VSCode Extension",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
@@ -35,6 +35,13 @@
     "force.com",
     "DevOps",
     "devops",
+    "Aura Helper SFDX Manager",
+    "SFDX Manager",
+    "aura-helper-sfdx-manager",
+    "sfdx-manager",
+    "ah-sfdx-manager",
+    "aura-helper-sfdx",
+    "Aura Helper SFDX",
     "Aura Helper CLI Manager",
     "CLI Manager",
     "aura-helper-cli-manager",
@@ -64,7 +71,7 @@
     "typescript": "^3.9.6"
   },
   "dependencies": {
-    "@aurahelper/core": "^2.0.0",
-    "@aurahelper/metadata-factory": "^2.0.0"
+    "@aurahelper/core": "^2.2.0",
+    "@aurahelper/metadata-factory": "^2.1.0"
   }
 }
