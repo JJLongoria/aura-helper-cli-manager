@@ -1079,6 +1079,7 @@ export class CLIManager {
                 }
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
+                    console.log(response);
                     endOperation(this);
                     if (this._useAuraHelperSFDX) {
                         this.handleResponse(response, () => {
@@ -1093,8 +1094,9 @@ export class CLIManager {
                         resolve(true);
                     }
                 }).catch((_error) => {
+                    console.log(_error);
                     endOperation(this);
-                    reject(false);
+                    resolve(false);
                 });
             } catch (error) {
                 endOperation(this);

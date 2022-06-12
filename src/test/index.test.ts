@@ -2,7 +2,7 @@ import { FileWriter, MetadataType, MetadataTypes } from '@aurahelper/core';
 import { CLIManager } from '../index';
 
 describe('Testing ./index.js', () => {
-    test('Testing compress()', async () => {
+    /*test('Testing compress()', async () => {
         const cliManager = new CLIManager('./src/test/assets/SFDXProject', 50);
         cliManager.setApiVersion(50);
         cliManager.setNamespacePrefix('');
@@ -154,13 +154,14 @@ describe('Testing ./index.js', () => {
         }
         //console.log(response);
         
-    }, 300000);
+    }, 300000);*/
     test('Testing isAuraHelperCLIInstalled()', async () => {
         const cliManager = new CLIManager('./src/test/assets/SFDXProject', 50);
         cliManager.setApiVersion(50);
         cliManager.setNamespacePrefix('');
         cliManager.setProjectFolder('./src/test/assets/SFDXProject');
         cliManager.setCompressFiles(true);
+        cliManager.useAuraHelperSFDX();
         cliManager.setSortOrder('simpleFirst');
         cliManager.setIgnoreFile('./src/test/assets/SFDXProject/.ahignore.json');
         cliManager.setOutputPath('./src/test/assets/SFDXProject/manifest');
@@ -169,7 +170,7 @@ describe('Testing ./index.js', () => {
         //console.log(response);
         
     }, 30000000);
-    test('Testing getAuraHelperCLIVersion()', async () => {
+    /*test('Testing getAuraHelperCLIVersion()', async () => {
         const cliManager = new CLIManager('./src/test/assets/SFDXProject', 50);
         cliManager.setApiVersion(50);
         cliManager.setNamespacePrefix('');
@@ -600,5 +601,5 @@ describe('Testing ./index.js', () => {
 
         }
         
-    }, 30000000);
+    }, 30000000);*/
 });
