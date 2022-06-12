@@ -1094,6 +1094,7 @@ export class CLIManager {
                         resolve(true);
                     }
                 }).catch((_error) => {
+                    console.log('error');
                     console.log(_error);
                     endOperation(this);
                     resolve(false);
