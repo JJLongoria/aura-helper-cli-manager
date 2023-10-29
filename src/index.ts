@@ -36,7 +36,9 @@ export class CLIManager {
     _event: EventEmitter;
     _processes: { [key: string]: Process };
     _abort: boolean;
+    _useAuraHelperCLI: boolean;
     _useAuraHelperSFDX: boolean;
+    _useAuraHelperSF: boolean;
 
 
     /**
@@ -59,6 +61,8 @@ export class CLIManager {
         this._processes = {};
         this._abort = false;
         this._useAuraHelperSFDX = false;
+        this._useAuraHelperSF = true;
+        this._useAuraHelperCLI = false;
     }
 
     /**
@@ -69,6 +73,46 @@ export class CLIManager {
      */
     useAuraHelperSFDX(useAuraHelperSFDX?: boolean): CLIManager {
         this._useAuraHelperSFDX = (useAuraHelperSFDX !== undefined) ? useAuraHelperSFDX : true;
+        if (this._useAuraHelperCLI) {
+            this._useAuraHelperCLI = false;
+        }
+        if (this._useAuraHelperSF) {
+            this._useAuraHelperSF = false;
+        }
+        return this;
+    }
+
+    /**
+     * Method to use Aura Helper SF Plugin instead Aura Helper CLI
+     * @param {boolean} useAuraHelperSF True to use Aura Helper SF Plugin
+     * 
+     * @returns {CLIManager} Returns the cli manager object
+     */
+    useAuraHelperSF(useAuraHelperSF?: boolean): CLIManager {
+        this._useAuraHelperSF = (useAuraHelperSF !== undefined) ? useAuraHelperSF : true;
+        if (this._useAuraHelperCLI) {
+            this._useAuraHelperCLI = false;
+        }
+        if (this._useAuraHelperSFDX) {
+            this._useAuraHelperSFDX = false;
+        }
+        return this;
+    }
+
+    /**
+     * Method to use Aura Helper SF Plugin instead Aura Helper Node CLI Application
+     * @param {boolean} useAuraHelperCLI True to use Aura Helper Node CLI Application
+     * 
+     * @returns {CLIManager} Returns the cli manager object
+     */
+    useAuraHelperCLI(useAuraHelperCLI?: boolean): CLIManager {
+        this._useAuraHelperCLI = (useAuraHelperCLI !== undefined) ? useAuraHelperCLI : true;
+        if (this._useAuraHelperSF) {
+            this._useAuraHelperSF = false;
+        }
+        if (this._useAuraHelperSFDX) {
+            this._useAuraHelperSFDX = false;
+        }
         return this;
     }
 
@@ -244,8 +288,12 @@ export class CLIManager {
                 if (nFiles > 0) {
                     if (this._useAuraHelperSFDX) {
                         process = ProcessFactory.auraHelperSFDXCompressFile(projectFolder, { file: resultPaths, sortOrder: sortOrder });
-                    } else {
+                    } else if (this._useAuraHelperCLI) {
                         process = ProcessFactory.auraHelperCompressFile(projectFolder, { file: resultPaths, sortOrder: sortOrder }, (ahCliProgress) => {
+                            this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                        });
+                    } else {
+                        process = ProcessFactory.auraHelperSFCompressFile(projectFolder, { file: resultPaths, sortOrder: sortOrder }, (ahCliProgress) => {
                             this._event.emit(EVENT.PROGRESS, ahCliProgress);
                         });
                     }
@@ -253,8 +301,12 @@ export class CLIManager {
                 else {
                     if (this._useAuraHelperSFDX) {
                         process = ProcessFactory.auraHelperSFDXCompressFolder(projectFolder, { folder: resultPaths, sortOrder: sortOrder });
-                    } else {
+                    } else if (this._useAuraHelperCLI) {
                         process = ProcessFactory.auraHelperCompressFolder(projectFolder, { folder: resultPaths, sortOrder: sortOrder }, (ahCliProgress) => {
+                            this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                        });
+                    } else {
+                        process = ProcessFactory.auraHelperSFCompressFolder(projectFolder, { folder: resultPaths, sortOrder: sortOrder }, (ahCliProgress) => {
                             this._event.emit(EVENT.PROGRESS, ahCliProgress);
                         });
                     }
@@ -297,8 +349,12 @@ export class CLIManager {
                 let process;
                 if (this._useAuraHelperSFDX) {
                     process = ProcessFactory.auraHelperSFDXOrgCompare(projectFolder, { apiVersion: this.apiVersion });
-                } else {
+                } else if (this._useAuraHelperCLI) {
                     process = ProcessFactory.auraHelperOrgCompare(projectFolder, { apiVersion: this.apiVersion }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                    });
+                } else {
+                    process = ProcessFactory.auraHelperSFOrgCompare(projectFolder, { apiVersion: this.apiVersion }, (ahCliProgress) => {
                         this._event.emit(EVENT.PROGRESS, ahCliProgress);
                     });
                 }
@@ -347,8 +403,12 @@ export class CLIManager {
                 let process;
                 if (this._useAuraHelperSFDX) {
                     process = ProcessFactory.auraHelperSFDXOrgCompareBetween(projectFolder, { source: source, target: target as string, apiVersion: this.apiVersion });
-                } else {
+                } else if (this._useAuraHelperCLI) {
                     process = ProcessFactory.auraHelperOrgCompareBetween(projectFolder, { source: source, target: target as string, apiVersion: this.apiVersion }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                    });
+                } else {
+                    process = ProcessFactory.auraHelperSFOrgCompareBetween(projectFolder, { source: source, target: target as string, apiVersion: this.apiVersion }, (ahCliProgress) => {
                         this._event.emit(EVENT.PROGRESS, ahCliProgress);
                     });
                 }
@@ -393,8 +453,12 @@ export class CLIManager {
                 let process;
                 if (this._useAuraHelperSFDX) {
                     process = ProcessFactory.auraHelperSFDXDescribeMetadata(projectFolder, { fromOrg: false, types: types, apiVersion: this.apiVersion, groupGlobalActions: groupGlobalActions });
-                } else {
+                } else if (this._useAuraHelperCLI) {
                     process = ProcessFactory.auraHelperDescribeMetadata(projectFolder, { fromOrg: false, types: types, apiVersion: this.apiVersion, groupGlobalActions: groupGlobalActions }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                    });
+                } else {
+                    process = ProcessFactory.auraHelperSFDescribeMetadata(projectFolder, { fromOrg: false, types: types, apiVersion: this.apiVersion, groupGlobalActions: groupGlobalActions }, (ahCliProgress) => {
                         this._event.emit(EVENT.PROGRESS, ahCliProgress);
                     });
                 }
@@ -445,9 +509,21 @@ export class CLIManager {
                         types: types,
                         apiVersion: this.apiVersion,
                         groupGlobalActions: groupGlobalActions
+                    }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                    });
+                } else if (this._useAuraHelperCLI) {
+                    process = ProcessFactory.auraHelperDescribeMetadata(projectFolder, {
+                        fromOrg: true,
+                        downloadAll: downloadAll,
+                        types: types,
+                        apiVersion: this.apiVersion,
+                        groupGlobalActions: groupGlobalActions
+                    }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
                     });
                 } else {
-                    process = ProcessFactory.auraHelperDescribeMetadata(projectFolder, {
+                    process = ProcessFactory.auraHelperSFDescribeMetadata(projectFolder, {
                         fromOrg: true,
                         downloadAll: downloadAll,
                         types: types,
@@ -506,9 +582,21 @@ export class CLIManager {
                         apiVersion: this.apiVersion,
                         compress: this.compressFiles,
                         sortOrder: this.sortOrder
+                    }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                    });
+                } else if (this._useAuraHelperCLI) {
+                    process = ProcessFactory.auraHelperRetrieveSpecial(projectFolder, {
+                        fromOrg: false,
+                        types: typesToRetrieve,
+                        apiVersion: this.apiVersion,
+                        compress: this.compressFiles,
+                        sortOrder: this.sortOrder
+                    }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
                     });
                 } else {
-                    process = ProcessFactory.auraHelperRetrieveSpecial(projectFolder, {
+                    process = ProcessFactory.auraHelperSFRetrieveSpecial(projectFolder, {
                         fromOrg: false,
                         types: typesToRetrieve,
                         apiVersion: this.apiVersion,
@@ -569,9 +657,22 @@ export class CLIManager {
                         apiVersion: this.apiVersion,
                         compress: this.compressFiles,
                         sortOrder: this.sortOrder
+                    }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                    });
+                } else if (this._useAuraHelperCLI) {
+                    process = ProcessFactory.auraHelperRetrieveSpecial(projectFolder, {
+                        fromOrg: true,
+                        types: typesToRetrieve,
+                        downloadAll: downloadAll,
+                        apiVersion: this.apiVersion,
+                        compress: this.compressFiles,
+                        sortOrder: this.sortOrder
+                    }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
                     });
                 } else {
-                    process = ProcessFactory.auraHelperRetrieveSpecial(projectFolder, {
+                    process = ProcessFactory.auraHelperSFRetrieveSpecial(projectFolder, {
                         fromOrg: true,
                         types: typesToRetrieve,
                         downloadAll: downloadAll,
@@ -634,9 +735,23 @@ export class CLIManager {
                         apiVersion: this.apiVersion,
                         compress: this.compressFiles,
                         sortOrder: this.sortOrder
+                    }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                    });
+                } else if (this._useAuraHelperCLI) {
+                    process = ProcessFactory.auraHelperRetrieveSpecial(projectFolder, {
+                        fromOrg: false,
+                        types: typesToRetrieve,
+                        includeOrg: true,
+                        downloadAll: downloadAll,
+                        apiVersion: this.apiVersion,
+                        compress: this.compressFiles,
+                        sortOrder: this.sortOrder
+                    }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
                     });
                 } else {
-                    process = ProcessFactory.auraHelperRetrieveSpecial(projectFolder, {
+                    process = ProcessFactory.auraHelperSFRetrieveSpecial(projectFolder, {
                         fromOrg: false,
                         types: typesToRetrieve,
                         includeOrg: true,
@@ -687,9 +802,17 @@ export class CLIManager {
                 if (this._useAuraHelperSFDX) {
                     process = ProcessFactory.auraHelperSFDXLoadPermissions(projectFolder, {
                         apiVersion: this.apiVersion,
+                    }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                    });
+                } else if (this._useAuraHelperCLI) {
+                    process = ProcessFactory.auraHelperLoadPermissions(projectFolder, {
+                        apiVersion: this.apiVersion,
+                    }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
                     });
                 } else {
-                    process = ProcessFactory.auraHelperLoadPermissions(projectFolder, {
+                    process = ProcessFactory.auraHelperSFLoadPermissions(projectFolder, {
                         apiVersion: this.apiVersion,
                     }, (ahCliProgress) => {
                         this._event.emit(EVENT.PROGRESS, ahCliProgress);
@@ -749,8 +872,10 @@ export class CLIManager {
                         deleteBefore: deleteOrder === 'before',
                         destructiveIgnoreFile: this.destructiveIgnoreFile,
                         ignoreDestructive: ignoreDestructive,
+                    }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
                     });
-                } else {
+                } else if (this._useAuraHelperCLI) {
                     process = ProcessFactory.auraHelperPackageGenerator(projectFolder, {
                         outputPath: this.outputPath,
                         createType: createType,
@@ -762,6 +887,21 @@ export class CLIManager {
                         ignoreFile: this.ignoreFile,
                         apiVersion: this.apiVersion,
                         explicit: true,
+                    }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                    });
+                } else {
+                    process = ProcessFactory.auraHelperSFGitPackage(projectFolder, {
+                        outputPath: this.outputPath,
+                        fileType: createType,
+                        source: source,
+                        target: target,
+                        useIgnore: useIgnore,
+                        ignoreFile: this.ignoreFile,
+                        apiVersion: this.apiVersion,
+                        deleteBefore: deleteOrder === 'before',
+                        destructiveIgnoreFile: this.destructiveIgnoreFile,
+                        ignoreDestructive: ignoreDestructive,
                     }, (ahCliProgress) => {
                         this._event.emit(EVENT.PROGRESS, ahCliProgress);
                     });
@@ -817,8 +957,10 @@ export class CLIManager {
                         apiVersion: this.apiVersion,
                         wilcards: !explicit,
                         toDelete: createType === 'destructive'
+                    }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
                     });
-                } else {
+                } else if (this._useAuraHelperCLI) {
                     process = ProcessFactory.auraHelperPackageGenerator(projectFolder, {
                         outputPath: this.outputPath,
                         createType: createType,
@@ -829,6 +971,19 @@ export class CLIManager {
                         ignoreFile: this.ignoreFile,
                         apiVersion: this.apiVersion,
                         explicit: explicit,
+                    }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                    });
+                } else {
+                    process = ProcessFactory.auraHelperSFJSONPackage(projectFolder, {
+                        outputPath: this.outputPath,
+                        source: source,
+                        deleteBefore: deleteOrder === 'before',
+                        useIgnore: useIgnore,
+                        ignoreFile: this.ignoreFile,
+                        apiVersion: this.apiVersion,
+                        wilcards: !explicit,
+                        toDelete: createType === 'destructive'
                     }, (ahCliProgress) => {
                         this._event.emit(EVENT.PROGRESS, ahCliProgress);
                     });
@@ -885,8 +1040,10 @@ export class CLIManager {
                         deleteBefore: deleteOrder === 'before',
                         ignoreDestructive: ignoreDestructive,
                         destructiveIgnoreFile: this.destructiveIgnoreFile,
+                    }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
                     });
-                } else {
+                } else if (this._useAuraHelperCLI) {
                     process = ProcessFactory.auraHelperPackageGenerator(projectFolder, {
                         outputPath: this.outputPath,
                         createType: createType,
@@ -897,6 +1054,20 @@ export class CLIManager {
                         ignoreFile: this.ignoreFile,
                         apiVersion: this.apiVersion,
                         explicit: true,
+                    }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                    });
+                } else {
+                    process = ProcessFactory.auraHelperSFMergePackage(projectFolder, {
+                        outputPath: this.outputPath,
+                        source: (sourceRes) ? sourceRes.join(',') : '',
+                        useIgnore: useIgnore,
+                        ignoreFile: this.ignoreFile,
+                        apiVersion: this.apiVersion,
+                        bytype: true,
+                        deleteBefore: deleteOrder === 'before',
+                        ignoreDestructive: ignoreDestructive,
+                        destructiveIgnoreFile: this.destructiveIgnoreFile,
                     }, (ahCliProgress) => {
                         this._event.emit(EVENT.PROGRESS, ahCliProgress);
                     });
@@ -944,9 +1115,20 @@ export class CLIManager {
                         ignoreFile: this.ignoreFile,
                         compress: this.compressFiles,
                         sortOrder: this.sortOrder
+                    }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                    });
+                } else if (this._useAuraHelperCLI) {
+                    process = ProcessFactory.auraHelperIgnore(projectFolder, {
+                        types: types,
+                        ignoreFile: this.ignoreFile,
+                        compress: this.compressFiles,
+                        sortOrder: this.sortOrder
+                    }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
                     });
                 } else {
-                    process = ProcessFactory.auraHelperIgnore(projectFolder, {
+                    process = ProcessFactory.auraHelperSFIgnore(projectFolder, {
                         types: types,
                         ignoreFile: this.ignoreFile,
                         compress: this.compressFiles,
@@ -1003,8 +1185,10 @@ export class CLIManager {
                         compress: this.compressFiles,
                         sortOrder: this.sortOrder,
                         apiVersion: this.apiVersion,
+                    }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
                     });
-                } else {
+                } else if (this._useAuraHelperCLI) {
                     process = ProcessFactory.auraHelperRepairDependencies(projectFolder, {
                         types: typesToRetrieve,
                         useIgnore: useIgnore,
@@ -1012,6 +1196,18 @@ export class CLIManager {
                         ignoreFile: this.ignoreFile,
                         compress: this.compressFiles,
                         sortOrder: this.sortOrder
+                    }, (ahCliProgress) => {
+                        this._event.emit(EVENT.PROGRESS, ahCliProgress);
+                    });
+                } else {
+                    process = ProcessFactory.auraHelperSFRepairDependencies(projectFolder, {
+                        types: typesToRetrieve,
+                        useIgnore: useIgnore,
+                        onlyCheck: onlyCheck,
+                        ignoreFile: this.ignoreFile,
+                        compress: this.compressFiles,
+                        sortOrder: this.sortOrder,
+                        apiVersion: this.apiVersion,
                     }, (ahCliProgress) => {
                         this._event.emit(EVENT.PROGRESS, ahCliProgress);
                     });
@@ -1074,8 +1270,10 @@ export class CLIManager {
                 let process;
                 if (this._useAuraHelperSFDX) {
                     process = ProcessFactory.getSFDXPlugins();
-                } else {
+                } else if (this._useAuraHelperCLI) {
                     process = ProcessFactory.isAuraHelperInstalled();
+                } else {
+                    process = ProcessFactory.getSFPlugins();
                 }
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
@@ -1085,6 +1283,15 @@ export class CLIManager {
                         this.handleResponse(response, () => {
                             endOperation(this);
                             if (response && StrUtils.contains(response, 'aura-helper-sfdx')) {
+                                resolve(true);
+                            } else {
+                                resolve(false);
+                            }
+                        });
+                    } else if (this._useAuraHelperSF) {
+                        this.handleResponse(response, () => {
+                            endOperation(this);
+                            if (response && StrUtils.contains(response, 'aura-helper-sf')) {
                                 resolve(true);
                             } else {
                                 resolve(false);
@@ -1122,14 +1329,16 @@ export class CLIManager {
                 let process;
                 if (this._useAuraHelperSFDX) {
                     process = ProcessFactory.auraHelperSFDXVersion();
-                } else {
+                } else if (this._useAuraHelperCLI) {
                     process = ProcessFactory.auraHelperVersion();
+                } else {
+                    process = ProcessFactory.auraHelperSFVersion();
                 }
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
                     this.handleResponse(response, () => {
                         endOperation(this);
-                        if (this._useAuraHelperSFDX) {
+                        if (this._useAuraHelperSFDX || this._useAuraHelperSF) {
                             resolve(response.result.version);
                         } else {
                             resolve(StrUtils.replace(response, 'Aura Helper CLI Version: v', ''));
@@ -1162,8 +1371,10 @@ export class CLIManager {
                 let process;
                 if (this._useAuraHelperSFDX) {
                     process = ProcessFactory.auraHelperSFDXUpdate();
-                } else {
+                } else if (this._useAuraHelperCLI) {
                     process = ProcessFactory.auraHelperUpdate();
+                } else {
+                    process = ProcessFactory.auraHelperSFUpdate();
                 }
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
@@ -1196,7 +1407,7 @@ export class CLIManager {
         startOperation(this);
         return new Promise((resolve, reject) => {
             try {
-                const process = ProcessFactory.auraHelperUpdateNPM();
+                const process = ProcessFactory.auraHelperCLIUpdateNPM();
                 addProcess(this, process);
                 ProcessHandler.runProcess(process).then((response) => {
                     endOperation(this);

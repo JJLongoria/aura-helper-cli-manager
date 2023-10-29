@@ -2,7 +2,7 @@
   "name": "@aurahelper/cli-manager",
   "productName": "Aura Helper CLI Manager",
   "displayName": "Aura Helper Framework CLI Manager",
-  "version": "2.1.3",
+  "version": "2.2.0",
   "description": "Module to handle Aura Helper CLI and Aura Helper SFDX processes used in Aura Helper VSCode Extension",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -71,7 +71,7 @@
     "typescript": "^3.9.6"
   },
   "dependencies": {
-    "@aurahelper/core": "^2.2.3",
+    "@aurahelper/core": "^2.6.0",
     "@aurahelper/metadata-factory": "^2.1.0"
   }
 }
